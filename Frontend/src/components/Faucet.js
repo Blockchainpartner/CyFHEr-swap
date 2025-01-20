@@ -1,13 +1,10 @@
 import React from 'react';
-import { useFhevm } from '../hooks/FHEhook';
 import { ethers } from "ethers";
-import { DISTRIBUTOR_CONTRACT_ABI } from '../ABI/ABI';
+import { DISTRIBUTOR_CONTRACT_ABI } from '../ABI/DistributorABI';
 import { TOKEN_DISTRIBUTOR, PRIVATE_EUR, PRIVATE_GBP, PRIVATE_USD } from '../constants/contracts';
 
 
 function Faucet() {
-    const { instance, loading } = useFhevm();
-
     const handleTokenRequest = async (TokenAddress) => {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
@@ -17,7 +14,6 @@ function Faucet() {
             const contractABI = DISTRIBUTOR_CONTRACT_ABI;
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
             const tx = await contract.claim(TokenAddress);
-
             await tx.wait();
             console.log("claim successful")
             // handle successfull call 
