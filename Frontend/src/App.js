@@ -3,11 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { ethers } from "ethers";
 import ConnectWallet from "./components/ConnectWallet";
 import Presentation from "./components/Presentation";
-import logo from "./assets/logo.png";
+import Dashboard from "./components/Dashboard";
 import Swap from "./components/Swap";
 import Faucet from "./components/Faucet";
 import ProvideLiquidity from "./components/ProvideLiquidity";
 import { FhevmProvider } from "./context/FhevmProvider";
+import logo from "./assets/logo.png";
+
 
 
 function App() {
@@ -68,10 +70,16 @@ function App() {
               Provide Liquidity
             </Link>
             <Link
-              to="/dashboard"
+              to="/faucet"
               className="hover:text-sky-400 transition-colors duration-300 cursor-pointer"
             >
               Faucet
+            </Link>
+            <Link
+              to="/dashboard"
+              className="hover:text-sky-400 transition-colors duration-300 cursor-pointer"
+            >
+              Dashboard
             </Link>
           </div>
 
@@ -90,7 +98,8 @@ function App() {
                   <Routes>
                     <Route path="/swap" element={<Swap />} />
                     <Route path="/provide-liquidity" element={<ProvideLiquidity />} />
-                    <Route path="/dashboard" element={<Faucet />} />
+                    <Route path="/faucet" element={<Faucet />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/" element={<Swap />} /> {/* Default Route */}
                   </Routes>
                 </>
