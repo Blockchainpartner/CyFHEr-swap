@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { initFhevm, createInstance } from "fhevmjs/bundle";
-
+import { KMS_CONTRACT_ADDRESS, ACL_CONTRACT_ADDRESS, GATEWAY_URL } from "../constants/contracts"
 export const FhevmContext = createContext();
 
 export const FhevmProvider = ({ children }) => {
@@ -13,9 +13,9 @@ export const FhevmProvider = ({ children }) => {
                 await initFhevm();
                 const newInstance = await createInstance({
                     network: window.ethereum,
-                    gatewayUrl: "https://gateway.sepolia.zama.ai",
-                    kmsContractAddress: "0x9D6891A6240D6130c54ae243d8005063D05fE14b",
-                    aclContractAddress: "0xFee8407e2f5e3Ee68ad77cAE98c434e637f516e5",
+                    gatewayUrl: GATEWAY_URL,
+                    kmsContractAddress: KMS_CONTRACT_ADDRESS,
+                    aclContractAddress: ACL_CONTRACT_ADDRESS,
                 });
                 setInstance(newInstance);
                 console.log('INSTANCE INITIALIZED')
