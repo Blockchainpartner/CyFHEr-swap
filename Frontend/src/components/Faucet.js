@@ -1,9 +1,12 @@
 import React from 'react';
+import { useFhevm } from '../hooks/FHEhook';
 
 function Faucet() {
+    const { instance, loading } = useFhevm();
+
     const handleTokenRequest = (token) => {
-        alert(`Requesting ${token} from the faucet!`);
-        // Logic to handle faucet request, such as interacting with a smart contract or API.
+        const { publicKey, privateKey } = instance.generateKeypair();
+        console.log("Public Key:", publicKey);
     };
 
     return (
