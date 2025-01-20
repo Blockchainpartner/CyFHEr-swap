@@ -7,20 +7,11 @@ import logo from "./assets/logo.png";
 import Swap from "./components/Swap";
 import Faucet from "./components/Faucet";
 import ProvideLiquidity from "./components/ProvideLiquidity";
-//import { InstanceProvider } from "./InstanceContext";
-import Counter from "./components/Counter";
-
-
+import { FhevmProvider } from "./context/FhevmProvider";
 
 
 function App() {
-
-
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-
-  useEffect(() => {
-    checkIfWalletIsConnected();
-  }, []);
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -40,6 +31,14 @@ function App() {
       console.error("Error checking wallet connection:", error);
     }
   };
+
+
+  useEffect(() => {
+    //TODO : fix page reload checking 
+    checkIfWalletIsConnected();
+  }, []);
+
+
   const handleWalletConnect = (connected) => {
     setIsWalletConnected(connected);
   };
@@ -81,29 +80,31 @@ function App() {
             <ConnectWallet isConnected={handleWalletConnect} />
           </div>
         </nav>
-
         <div className="flex flex-row h-[calc(100vh-64px)]">
           <Presentation />
-          <div className="flex flex-col items-center justify-center w-3/4 space-y-6">
-            {isWalletConnected ? (
-              <>
-                <Routes>
-                  <Route path="/swap" element={<Swap />} />
-                  <Route path="/provide-liquidity" element={<ProvideLiquidity />} />
-                  <Route path="/dashboard" element={<Faucet />} />
-                  <Route path="/" element={<Swap />} /> {/* Default Route */}
-                </Routes>
-              </>
-            ) : (
-              <>
-                <div className="relative flex w-full flex-col items-center justify-center">
-                  <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
-                    Connect wallet
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
+          <FhevmProvider>
+
+            <div className="flex flex-col items-center justify-center w-3/4 space-y-6">
+              {isWalletConnected ? (
+                <>
+                  <Routes>
+                    <Route path="/swap" element={<Swap />} />
+                    <Route path="/provide-liquidity" element={<ProvideLiquidity />} />
+                    <Route path="/dashboard" element={<Faucet />} />
+                    <Route path="/" element={<Swap />} /> {/* Default Route */}
+                  </Routes>
+                </>
+              ) : (
+                <>
+                  <div className="relative flex w-full flex-col items-center justify-center">
+                    <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
+                      Connect wallet
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </FhevmProvider>
         </div>
       </div>
     </Router>
