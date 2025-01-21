@@ -59,25 +59,25 @@ function App() {
           <div className="absolute left-1/2 transform -translate-x-1/2 top-0 flex space-x-8 text-lg pt-5">
             <Link
               to="/swap"
-              className="hover:text-sky-400 transition-colors duration-300 cursor-pointer"
+              className="hover:text-sky-400 font-bold transition-colors duration-300 cursor-pointer"
             >
               Swap
             </Link>
             <Link
               to="/provide-liquidity"
-              className="hover:text-sky-400 transition-colors duration-300 cursor-pointer"
+              className="hover:text-sky-400 font-bold transition-colors duration-300 cursor-pointer"
             >
               Provide Liquidity
             </Link>
             <Link
               to="/faucet"
-              className="hover:text-sky-400 transition-colors duration-300 cursor-pointer"
+              className="hover:text-sky-400  font-bold transition-colors duration-300 cursor-pointer"
             >
               Faucet
             </Link>
             <Link
               to="/dashboard"
-              className="hover:text-sky-400 transition-colors duration-300 cursor-pointer"
+              className="hover:text-sky-400  font-bold transition-colors duration-300 cursor-pointer"
             >
               Dashboard
             </Link>
