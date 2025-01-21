@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useFhevm } from '../hooks/FHEhook';
-import { PRIVATE_EUR, PRIVATE_GBP, PRIVATE_USD } from '../constants/contracts';
+import { TOKEN_CONTRACT } from '../constants/contracts';
+
 import { ERC_CONTRACT_ABI } from '../ABI/ERC20ABI';
 import { ethers } from 'ethers';
 
@@ -15,8 +16,7 @@ function Dashboard() {
     const handleCheckBalance = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
-        console.log(signer.address)
-        const contractAddress = PRIVATE_EUR;
+        const contractAddress = TOKEN_CONTRACT[selectedToken];
         const contractABI = ERC_CONTRACT_ABI;
         const { publicKey, privateKey } = instance.generateKeypair();
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -25,6 +25,7 @@ function Dashboard() {
         const signature = await window.ethereum.request({ method: "eth_signTypedData_v4", params });
         const handle = await contract.balanceOf(signer.address); // returns the handle of hte ciphertext as a uint256 (bigint)
         console.log(handle)
+        // handle decrypting
         const myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
         setBalance(Number(myBalance))
 
@@ -43,9 +44,9 @@ function Dashboard() {
                         onChange={(e) => setSelectedToken(e.target.value)}
                         className="w-full bg-transparent text-white border border-white/40 rounded-lg py-2 px-4"
                     >
-                        <option value="EUR">Private EURO (EUR)</option>
-                        <option value="USD">Private USD (USD)</option>
-                        <option value="GBP">Private GBP (GBP)</option>
+                        <option value="pEUR">Private EURO (pEUR)</option>
+                        <option value="pUSD">Private USD (pUSD)</option>
+                        <option value="pGBP">Private GBP (pGBP)</option>
                     </select>
 
                     {/* Check Balance Button */}
@@ -61,7 +62,7 @@ function Dashboard() {
                 {balance !== null && (
                     <div className="text-center text-white text-lg mt-4">
                         <p>Your balance is:</p>
-                        <p className="font-bold text-2xl">{balance} tokens</p>
+                        <p className="font-bold text-2xl">{balance + "  " + selectedToken} </p>
                     </div>
                 )}
             </div>
