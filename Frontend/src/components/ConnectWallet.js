@@ -14,19 +14,21 @@ function ConnectWallet({ isConnected }) {
             setError(null);
         } catch (error) {
             isConnected(false);
-            setError("You need to install a wallet extension ");
-            console.error(error);
+            if (error.message.includes("invalid EIP-1193 provider")) {
+                setError("You need to install an EVM wallet");
+
+            }
+            else {
+                setError("Error connecting");
+            }
         }
     };
 
-    const disconnectWallet = () => {
-        setAccount(null);
-        setError(null);
-        isConnected(false);
-    };
+
 
     useEffect(() => {
         if (window.ethereum) {
+
             // Listen for account changes
             const handleAccountsChanged = (accounts) => {
                 if (accounts.length === 0) {
@@ -45,34 +47,24 @@ function ConnectWallet({ isConnected }) {
                 setAccount(null);
                 setError(null); // Handle disconnection
             };
-
             window.ethereum.on("accountsChanged", handleAccountsChanged);
             window.ethereum.on("disconnect", handleDisconnect);
 
-            // Cleanup event listeners on component unmount
-            return () => {
-                window.ethereum.removeListener(
-                    "accountsChanged",
-                    handleAccountsChanged
-                );
-                window.ethereum.removeListener("disconnect", handleDisconnect);
-            };
+
         }
-    }, [isConnected]); // The empty array ensures this effect runs only once on mount
+    }, []); // The empty array ensures this effect runs only once on mount
 
     return (
         <div className=" text-white rounded-lg transition-colors duration-300">
 
             {account ? (
                 <div className="flex items-center space-x-4">
-                    <span className="text-white font-bold text-sm">
-                        {account.slice(0, 6)}...{account.slice(-4)}
-                    </span>
+
                     <button
-                        onClick={disconnectWallet}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-500 focus:outline-none font-semibold"
+                        disabled={true}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md  focus:outline-none font-semibold"
                     >
-                        Disconnect
+                        {account.slice(0, 6)}...{account.slice(-4)}
                     </button>
 
                 </div>
