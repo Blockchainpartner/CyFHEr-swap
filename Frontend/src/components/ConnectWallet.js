@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 
 function ConnectWallet({ isConnected }) {
     const [account, setAccount] = useState(null);
-    const [network, setNetwork] = useState(null);
     const [error, setError] = useState(null);
 
     const connectWallet = async () => {
@@ -11,20 +10,17 @@ function ConnectWallet({ isConnected }) {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const accounts = await provider.send("eth_requestAccounts", []);
             setAccount(accounts[0]);
-            const network = await provider.getNetwork();
             isConnected(true);
-            setNetwork(network);
             setError(null);
         } catch (error) {
             isConnected(false);
-            setError("Connection failed. Please try again.");
+            setError("You need to install a wallet extension ");
             console.error(error);
         }
     };
 
     const disconnectWallet = () => {
         setAccount(null);
-        setNetwork(null);
         setError(null);
         isConnected(false);
     };
@@ -47,7 +43,6 @@ function ConnectWallet({ isConnected }) {
             const handleDisconnect = (error) => {
                 console.log("Disconnected from the wallet:", error);
                 setAccount(null);
-                setNetwork(null);
                 setError(null); // Handle disconnection
             };
 
@@ -63,15 +58,14 @@ function ConnectWallet({ isConnected }) {
                 window.ethereum.removeListener("disconnect", handleDisconnect);
             };
         }
-    }, []); // The empty array ensures this effect runs only once on mount
+    }, [isConnected]); // The empty array ensures this effect runs only once on mount
 
     return (
         <div className=" text-white rounded-lg transition-colors duration-300">
-            {error && <p className="text-red-500 mt-2">{error}</p>}
 
             {account ? (
                 <div className="flex items-center space-x-4">
-                    <span className="text-white text-sm">
+                    <span className="text-white font-bold text-sm">
                         {account.slice(0, 6)}...{account.slice(-4)}
                     </span>
                     <button
@@ -83,12 +77,15 @@ function ConnectWallet({ isConnected }) {
 
                 </div>
             ) : (
-                <button
-                    onClick={connectWallet}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-500 focus:outline-none font-semibold"
-                >
-                    Connect Wallet
-                </button>
+                <div className="flex items-center space-x-4">
+                    {error && <p className="text-purple-600 font-medium mt-2">{error}</p>}
+                    <button
+                        onClick={connectWallet}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-500 focus:outline-none font-semibold"
+                    >
+                        Connect Wallet
+                    </button>
+                </div>
             )}
         </div>
     );
