@@ -18,13 +18,14 @@ function Dashboard() {
         const signer = await provider.getSigner();
         const contractAddress = TOKEN_CONTRACT[selectedToken];
         const contractABI = ERC_CONTRACT_ABI;
+        // these should be generated only once and stored in the app 
         const { publicKey, privateKey } = instance.generateKeypair();
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
         const eip712 = instance.createEIP712(publicKey, contractAddress);
         const params = [signer.address, JSON.stringify(eip712)];
         const signature = await window.ethereum.request({ method: "eth_signTypedData_v4", params });
         const handle = await contract.balanceOf(signer.address); // returns the handle of hte ciphertext as a uint256 (bigint)
-        console.log(handle)
+
         // handle decrypting
         const myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
         setBalance(Number(myBalance))
@@ -34,39 +35,49 @@ function Dashboard() {
 
 
     return (
-        <div className="bg-white/20 backdrop-blur-lg border border-white/20 rounded-lg p-8 w-full max-w-lg shadow-2xl space-y-6">
-            <h1 className="text-3xl font-semibold text-white text-center">Token Balance</h1>
-            <div className="space-y-4">
-                <div className="flex flex-col items-center space-y-4">
-                    {/* Token Selector */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl  p-8 w-full max-w-lg shadow-xl space-y-6">
+            <h1 className="text-2xl font-semibold text-white text-center">Token Balance</h1>
+            <div className="flex items-center space-x-4">
+                {/* Stylish Token Selector */}
+                <div className="flex-1">
+                    <label
+                        htmlFor="tokens"
+                        className="block mb-2 text-sm font-medium text-white"
+                    >
+                        Select Token
+                    </label>
                     <select
+                        id="tokens"
                         value={selectedToken}
                         onChange={(e) => setSelectedToken(e.target.value)}
-                        className="w-full bg-transparent text-white border border-white/40 rounded-lg py-2 px-4"
+                        className="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 shadow-sm transition duration-300"
                     >
                         <option value="pEUR">Private EURO (pEUR)</option>
                         <option value="pUSD">Private USD (pUSD)</option>
                         <option value="pGBP">Private GBP (pGBP)</option>
                     </select>
-
-                    {/* Check Balance Button */}
-                    <button
-                        onClick={handleCheckBalance}
-                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300"
-                    >
-                        Check Balance
-                    </button>
                 </div>
 
-                {/* Display Balance */}
-                {balance !== null && (
-                    <div className="text-center text-white text-lg mt-4">
-                        <p>Your balance is:</p>
-                        <p className="font-bold text-2xl">{balance + "  " + selectedToken} </p>
-                    </div>
-                )}
+                {/* Check Balance Button */}
+                <button
+                    onClick={handleCheckBalance}
+                    className="flex-none mt-4 py-2 px-5 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 focus:ring-2 focus:ring-blue-400"
+                >
+                    Check Balance
+                </button>
             </div>
+
+
+            {/* Display Balance */}
+            {balance !== null && (
+                <div className="text-center text-gray-800 text-lg mt-4">
+                    <p>Your balance is:</p>
+                    <p className="font-bold text-2xl">{balance + " " + selectedToken}</p>
+                </div>
+            )}
         </div>
+
+
 
     )
 }

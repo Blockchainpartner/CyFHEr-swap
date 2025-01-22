@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, NavLink, Route, Routes } from "react-router-dom";
 import { ethers } from "ethers";
 import ConnectWallet from "./components/ConnectWallet";
 import Presentation from "./components/Presentation";
@@ -9,6 +9,7 @@ import Faucet from "./components/Faucet";
 import ProvideLiquidity from "./components/ProvideLiquidity";
 import { FhevmProvider } from "./context/FhevmProvider";
 import logo from "./assets/logo.png";
+import { Toaster } from 'react-hot-toast';
 
 
 
@@ -44,50 +45,72 @@ function App() {
   const handleWalletConnect = (connected) => {
     setIsWalletConnected(connected);
   };
-
-
+  //<div class="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div></div>
   return (
     <Router>
-      <div className="min-h-screen overflow-hidden bg-gradient-to-r from-indigo-900 to-sky-400">
-        <nav className="relative px-6 py-9 bg-transparent text-white shadow-lg">
+      <div className="absolute inset-0 -z-10 h-full w-full items-center px-5  [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]  ">
+
+        <nav className="relative px-6 py-9 bg-grey text-white shadow-lg">
           {/* Logo - fixed to the top-left */}
-          <div className="absolute left-0 top-0 flex items-center ">
-            <img src={logo} alt="Logo" className="h-20 w-full mr-2  " />
+          <div className="absolute left-0 top-0 flex items-center">
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-20 w-full mr-2 filter contrast-1 brightness-100"
+            />
           </div>
 
           {/* Fixed Navigation Links Container - centered */}
           <div className="absolute left-1/2 transform -translate-x-1/2 top-0 flex space-x-8 text-lg pt-5">
-            <Link
+            <NavLink
               to="/swap"
-              className="hover:text-sky-400 font-bold transition-colors duration-300 cursor-pointer"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+              }
             >
               Swap
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/provide-liquidity"
-              className="hover:text-sky-400 font-bold transition-colors duration-300 cursor-pointer"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+              }
             >
               Provide Liquidity
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/faucet"
-              className="hover:text-sky-400  font-bold transition-colors duration-300 cursor-pointer"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+              }
             >
               Faucet
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/dashboard"
-              className="hover:text-sky-400  font-bold transition-colors duration-300 cursor-pointer"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+              }
             >
               Dashboard
-            </Link>
+            </NavLink>
           </div>
-
           {/* Connect Wallet Button - fixed to the top-right */}
           <div className="absolute right-0 top-0 flex items-center px-6 py-3">
             <ConnectWallet isConnected={handleWalletConnect} />
           </div>
         </nav>
+
+
+
         <div className="flex flex-row h-[calc(100vh-64px)]">
           <Presentation />
           <FhevmProvider>
@@ -115,6 +138,8 @@ function App() {
             </div>
           </FhevmProvider>
         </div>
+        <Toaster position="bottom-center"
+          reverseOrder={false} />
       </div>
     </Router>
 
