@@ -10,8 +10,8 @@ import ProvideLiquidity from "./components/ProvideLiquidity";
 import { FhevmProvider } from "./context/FhevmProvider";
 import logo from "./assets/logo.png";
 import { Toaster } from 'react-hot-toast';
-
-
+//import WalletGif from "./components/WalletGif";
+import walletGif from "./assets/wallet.gif";
 
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -129,9 +129,12 @@ function App() {
               ) : (
                 <>
                   <div className="relative flex w-full flex-col items-center justify-center">
+
                     <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
                       Connect wallet
                     </p>
+                    <img src={walletGif} alt="Wallet Animation" className="w-1/5 h-auto" />
+
                   </div>
                 </>
               )}
