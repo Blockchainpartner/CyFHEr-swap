@@ -34,8 +34,9 @@ function Faucet() {
     };
 
     return (
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-8 w-half max-w-lg shadow-2xl space-y-6">
-            <h1 className="text-3xl font-semibold text-white text-center">Request Tokens from Faucet</h1>
+        <div className="bg-black text-white w-[400px]  px-auto py-6 rounded-xl shadow-lg mx-auto relative border border-purple-800 
+        before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10">
+            <h1 className="text-2xl  mb-9 font-semibold text-white text-center">Request Tokens from Faucet</h1>
 
             <div className="flex flex-col items-center space-y-6">
                 {/* Private EURO Button */}

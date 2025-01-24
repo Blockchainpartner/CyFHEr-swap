@@ -10,7 +10,6 @@ import ProvideLiquidity from "./components/ProvideLiquidity";
 import { FhevmProvider } from "./context/FhevmProvider";
 import logo from "./assets/logo.png";
 import { Toaster } from 'react-hot-toast';
-//import WalletGif from "./components/WalletGif";
 import walletGif from "./assets/wallet.gif";
 
 function App() {
@@ -45,7 +44,6 @@ function App() {
   const handleWalletConnect = (connected) => {
     setIsWalletConnected(connected);
   };
-  //<div class="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div></div>
   return (
     <Router>
       <div className="absolute inset-0 -z-10 h-full w-full items-center px-5  [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]  ">
@@ -61,12 +59,12 @@ function App() {
           </div>
 
           {/* Fixed Navigation Links Container - centered */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-0 flex space-x-8 text-lg pt-5">
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-0 flex space-x-6 text-lg pt-5">
             <NavLink
               to="/swap"
               className={({ isActive }) =>
                 isActive
-                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  ? "text-white bg-violet-400 font-bold transition-all duration-500 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -76,7 +74,7 @@ function App() {
               to="/provide-liquidity"
               className={({ isActive }) =>
                 isActive
-                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  ? "text-white bg-violet-400 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -86,7 +84,7 @@ function App() {
               to="/faucet"
               className={({ isActive }) =>
                 isActive
-                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  ? "text-white bg-violet-400 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -96,7 +94,7 @@ function App() {
               to="/dashboard"
               className={({ isActive }) =>
                 isActive
-                  ? "text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
+                  ? "text-white bg-violet-400 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -107,6 +105,7 @@ function App() {
           <div className="absolute right-0 top-0 flex items-center px-6 py-3">
             <ConnectWallet isConnected={handleWalletConnect} />
           </div>
+
         </nav>
 
 

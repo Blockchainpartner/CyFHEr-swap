@@ -23,19 +23,29 @@ function Dashboard() {
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
         const eip712 = instance.createEIP712(publicKey, contractAddress);
         const params = [signer.address, JSON.stringify(eip712)];
+        // TODO : to fix error handling
         const signature = await window.ethereum.request({ method: "eth_signTypedData_v4", params });
+
+
         const handle = await contract.balanceOf(signer.address); // returns the handle of hte ciphertext as a uint256 (bigint)
 
         // handle decrypting
-        const myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
-        setBalance(Number(myBalance))
+        try {
+
+            const myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
+            setBalance(Number(myBalance))
+
+        }
+        catch (error) { console.error(error) }
+
 
 
     };
 
 
     return (
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl  p-8 w-full max-w-lg shadow-xl space-y-6">
+        <div className="bg-black text-white w-1/2  px-10 py-6 rounded-xl shadow-lg mx-auto relative border border-purple-800 
+        before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10">
             <h1 className="text-2xl font-semibold text-white text-center">Token Balance</h1>
             <div className="flex items-center space-x-4">
                 {/* Stylish Token Selector */}
@@ -61,16 +71,16 @@ function Dashboard() {
                 {/* Check Balance Button */}
                 <button
                     onClick={handleCheckBalance}
-                    className="flex-none mt-4 py-2 px-5 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 focus:ring-2 focus:ring-blue-400"
+                    className="flex-none mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
                 >
-                    Check Balance
+                    Decrypt Balance
                 </button>
             </div>
 
 
             {/* Display Balance */}
             {balance !== null && (
-                <div className="text-center text-gray-800 text-lg mt-4">
+                <div className="text-center text-white text-lg mt-4">
                     <p>Your balance is:</p>
                     <p className="font-bold text-2xl">{balance + " " + selectedToken}</p>
                 </div>
