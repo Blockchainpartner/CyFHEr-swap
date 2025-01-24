@@ -1,80 +1,164 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 
 function Swap() {
-    const [amountFrom, setAmountFrom] = useState('');
-    const [amountTo, setAmountTo] = useState('');
-    const [selectedTokenFrom, setSelectedTokenFrom] = useState('ETH');
-    const [selectedTokenTo, setSelectedTokenTo] = useState('USDT');
+    const [tokens, setTokens] = useState([]);
+    const [sellValue, setSellValue] = useState("");
+    const [buyValue, setBuyValue] = useState("");
+    const [selectedSellToken, setSelectedSellToken] = useState("ETH");
+    const [selectedBuyToken, setSelectedBuyToken] = useState("BTC");
 
-    const handleAmountChange = (e) => {
-        setAmountFrom(e.target.value);
-        // Just for demo purposes, we simulate token conversion
-        setAmountTo((e.target.value * 2000).toFixed(2)); // Assume 1 ETH = 2000 USDT
-    };
+    // Fetch placeholder token data (replace with a real data)
+    useEffect(() => {
+        fetch("https://jsonplaceholder.typicode.com/users") // Mock API
+            .then((response) => response.json())
+            .then((data) => {
+                const placeholderTokens = data.map((item) => item.name); // Mock token names
+                //setTokens(placeholderTokens);
+            })
+            .catch((error) => console.error("Error fetching tokens:", error));
+    }, []);
 
+    // Handle swapping Sell and Buy values
     const handleSwap = () => {
-        alert(`Swapping ${amountFrom} ${selectedTokenFrom} to ${amountTo} ${selectedTokenTo}`);
+        const tempValue = sellValue;
+        const tempToken = selectedSellToken;
+
+        setSellValue(buyValue);
+        setSelectedSellToken(selectedBuyToken);
+
+        setBuyValue(tempValue);
+        setSelectedBuyToken(tempToken);
+        console.log('swap token')
     };
 
     return (
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-8 w-full max-w-2xl shadow-2xl space-y-6">
-            <h1 className="text-3xl font-semibold text-white text-center">Swap Tokens</h1>
-
-            <div className="flex flex-col space-y-4">
-                {/* From Token */}
-                <div className="flex items-center justify-between">
+        <div className="bg-black text-white w-[400px] p-6 rounded-xl shadow-lg mx-auto relative border border-purple-800 
+                before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10">
+            {/* Sell Section */}
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <label className="text-sm text-gray-400">Sell</label>
                     <input
                         type="number"
-                        value={amountFrom}
-                        onChange={handleAmountChange}
-                        placeholder="0.0"
-                        className="w-3/4 px-4 py-2 rounded-lg bg-transparent border-2 border-white/40 text-white text-xl focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="0"
+                        value={sellValue}
+                        onChange={(e) => setSellValue(e.target.value)}
+                        className="block w-full bg-transparent text-3xl font-semibold text-white placeholder-gray-500 focus:outline-none"
                     />
-                    <div className="flex items-center space-x-2">
-                        <select
-                            value={selectedTokenFrom}
-                            onChange={(e) => setSelectedTokenFrom(e.target.value)}
-                            className="bg-transparent text-white border-b-2 border-white/40 focus:outline-none"
-                        >
-                            <option value="ETH">ETH</option>
-                            <option value="USDT">USDT</option>
-                            <option value="BTC">BTC</option>
-                        </select>
-                    </div>
                 </div>
-
-                {/* To Token */}
-                <div className="flex items-center justify-between">
-                    <input
-                        type="number"
-                        value={amountTo}
-                        disabled
-                        placeholder="0.0"
-                        className="w-3/4 px-4 py-2 rounded-lg bg-transparent border-2 border-white/40 text-white text-xl focus:outline-none"
-                    />
-                    <div className="flex items-center space-x-2">
-                        <select
-                            value={selectedTokenTo}
-                            onChange={(e) => setSelectedTokenTo(e.target.value)}
-                            className="bg-transparent text-white border-b-2 border-white/40 focus:outline-none"
+                <div className="relative">
+                    <button
+                        className="flex items-center bg-gray-800 px-3 py-1.5 rounded-full"
+                        onClick={() => alert(`Selected token: ${selectedSellToken}`)}
+                    >
+                        <span>{selectedSellToken}</span>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-4 h-4 ml-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                         >
-                            <option value="USDT">USDT</option>
-                            <option value="ETH">ETH</option>
-                            <option value="BTC">BTC</option>
-                        </select>
-                    </div>
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            {/* Swap Button */}
+            {/* Divider */}
+            <div className="flex justify-center items-center my-4 relative">
+                <div className="w-full h-px bg-gray-700" />
+                <button
+                    onClick={handleSwap}
+                    className="absolute bg-gray-800 p-2 rounded-full shadow-md hover:ring-2 hover:ring-violet-500 transition-all duration-200"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-4 h-4 text-white hover:drop-shadow-[0_0_6px_rgba(139,92,246,1)]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+
+            {/* Buy Section */}
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <label className="text-sm text-gray-400">Buy</label>
+                    <input
+                        type="number"
+                        placeholder="0"
+                        value={buyValue}
+                        onChange={(e) => setBuyValue(e.target.value)}
+                        className="block w-full bg-transparent text-3xl font-semibold text-white placeholder-gray-500 focus:outline-none"
+                    />
+                </div>
+                <div className="relative">
+                    <button
+                        className="flex items-center bg-gray-800 px-3 py-1.5 rounded-full"
+                        onClick={() => alert(`Selected token: ${selectedBuyToken}`)}
+                    >
+                        {selectedBuyToken}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-4 h-4 inline ml-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </button>
+                    {/* Dropdown for tokens */}
+                    {tokens.length > 0 && (
+                        <ul className="absolute top-full mt-2 bg-gray-800 text-white rounded-md shadow-md z-10">
+                            {tokens.map((token, index) => (
+                                <li
+                                    key={index}
+                                    className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+                                    onClick={() => setSelectedBuyToken(token)}
+                                >
+                                    {token}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </div>
+
+            {/* Action Button */}
             <button
-                onClick={handleSwap}
-                className="w-full py-3 bg-sky-500 text-white rounded-lg shadow-md hover:bg-sky-600 transition-colors duration-300"
+                onClick={() =>
+                    alert(`Swapping ${sellValue} ${selectedSellToken} for ${buyValue} ${selectedBuyToken}`)
+                }
+                className="w-full text-center text-white  mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
             >
-                Swap Now
+
+                Swap
             </button>
         </div>
     );
-}
+
+};
+
 
 export default Swap;
