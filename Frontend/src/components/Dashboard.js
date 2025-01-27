@@ -9,15 +9,14 @@ import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 
 function Dashboard() {
-    const people = [
+    const tokens = [
         { id: 1, name: 'pEUR' },
         { id: 2, name: 'pUSD' },
-        { id: 3, name: 'pGPB' },
+        { id: 3, name: 'pGBP' },
 
     ]
 
     const [selectedToken, setSelectedToken] = useState('pEUR'); // Default token as EUR
-    const [selected, setSelected] = useState(people[0]); // Default token as EUR
 
     const [balance, setBalance] = useState(null);
     const { instance, loading } = useFhevm();
@@ -25,6 +24,7 @@ function Dashboard() {
     const handleCheckBalance = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
+        console.log(selectedToken)
         const contractAddress = TOKEN_CONTRACT[selectedToken];
         const contractABI = ERC_CONTRACT_ABI;
         // these should be generated only once and stored in the app 
@@ -40,6 +40,7 @@ function Dashboard() {
             await toast.promise(
                 (async () => {
                     myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
+                    setBalance(Number(myBalance))
 
                 })(),
                 {
@@ -48,30 +49,31 @@ function Dashboard() {
                     error: 'An error occurred while decrypting 😢',
                 }
             );
-            setBalance(Number(myBalance))
-
         }
         catch (error) { console.error(error) }
-
-
-
     };
 
+    const OnChangeToken = (value) => {
+        if (selectedToken != value) {
+            setBalance(null);
 
+            setSelectedToken(value);
+        }
+    }
     return (
         <div className="bg-black text-white w-1/2  px-10 py-6 rounded-xl shadow-lg mx-auto relative border border-purple-800 
         before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10">
             <h1 className="text-2xl font-semibold text-white text-center">Token Balance</h1>
             <div className="flex items-center space-x-4">
                 {/* Stylish Token Selector */}
-                <Listbox value={selected} onChange={setSelected}>
+                <Listbox value={selectedToken} onChange={OnChangeToken}>
                     <ListboxButton
                         className={clsx(
                             'relative block w-3/4 rounded-lg bg-black border border-purple-800 mt-6 py-2 pr-8 pl-4 text-left text-sm/6 text-white',
                             'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black'
                         )}
                     >
-                        {selected.name}
+                        {selectedToken}
                         <ChevronDownIcon
                             className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
                             aria-hidden="true"
@@ -85,14 +87,14 @@ function Dashboard() {
                             'transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0'
                         )}
                     >
-                        {people.map((person) => (
+                        {tokens.map((token) => (
                             <ListboxOption
-                                key={person.name}
-                                value={person}
+                                key={token.id}
+                                value={token.name}
                                 className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-white/10"
                             >
                                 <CheckIcon className="invisible size-4 fill-white group-data-[selected]:visible" />
-                                <div className="text-sm/6 text-white">{person.name}</div>
+                                <div className="text-sm/6 text-white">{token.name}</div>
                             </ListboxOption>
                         ))}
                     </ListboxOptions>
