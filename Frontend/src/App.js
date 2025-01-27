@@ -47,7 +47,6 @@ function App() {
   return (
     <Router>
       <div className="absolute inset-0 -z-10 h-full w-full items-center px-5  [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]  ">
-
         <nav className="relative px-6 py-9 bg-grey text-white shadow-lg">
           {/* Logo - fixed to the top-left */}
           <div className="absolute left-0 top-0 flex items-center">
@@ -64,7 +63,7 @@ function App() {
               to="/swap"
               className={({ isActive }) =>
                 isActive
-                  ? "text-white bg-violet-400 font-bold transition-all duration-500 cursor-pointer rounded-full px-4 py-1"
+                  ? "text-white bg-violet-500 font-bold transition-all duration-500 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -74,7 +73,7 @@ function App() {
               to="/provide-liquidity"
               className={({ isActive }) =>
                 isActive
-                  ? "text-white bg-violet-400 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
+                  ? "text-white bg-violet-500 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -84,7 +83,7 @@ function App() {
               to="/faucet"
               className={({ isActive }) =>
                 isActive
-                  ? "text-white bg-violet-400 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
+                  ? "text-white bg-violet-500 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >
@@ -94,7 +93,7 @@ function App() {
               to="/dashboard"
               className={({ isActive }) =>
                 isActive
-                  ? "text-white bg-violet-400 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
+                  ? "text-white bg-violet-500 font-bold transition-all duration-300 cursor-pointer rounded-full px-4 py-1"
                   : "hover:text-violet-400 font-bold transition-colors duration-300 cursor-pointer"
               }
             >

@@ -2,7 +2,7 @@ import React from 'react';
 import { ethers } from "ethers";
 import { DISTRIBUTOR_CONTRACT_ABI } from '../ABI/DistributorABI';
 import { TOKEN_DISTRIBUTOR, PRIVATE_EUR, PRIVATE_GBP, PRIVATE_USD } from '../constants/contracts';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 
 function Faucet() {
