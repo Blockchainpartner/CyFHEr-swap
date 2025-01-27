@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 function Swap() {
-    const [tokens, setTokens] = useState([]);
     const [sellValue, setSellValue] = useState("");
     const [buyValue, setBuyValue] = useState("");
-    const [selectedSellToken, setSelectedSellToken] = useState("ETH");
-    const [selectedBuyToken, setSelectedBuyToken] = useState("BTC");
+    const [selectedSellToken, setSelectedSellToken] = useState("pEUR");
+    const [selectedBuyToken, setSelectedBuyToken] = useState("pUSD");
+    const [isSellDropdownOpen, setSellDropdownOpen] = useState(false);
+    const [isBuyDropdownOpen, setBuyDropdownOpen] = useState(false);
 
-    // Fetch placeholder token data (replace with a real data)
-    useEffect(() => {
-        fetch("https://jsonplaceholder.typicode.com/users") // Mock API
-            .then((response) => response.json())
-            .then((data) => {
-                const placeholderTokens = data.map((item) => item.name); // Mock token names
-                //setTokens(placeholderTokens);
-            })
-            .catch((error) => console.error("Error fetching tokens:", error));
-    }, []);
+    // Available tokens for swapping
+    const tokens = ["pEUR", "pGPD", "pUSD"];
 
     // Handle swapping Sell and Buy values
     const handleSwap = () => {
@@ -28,12 +21,13 @@ function Swap() {
 
         setBuyValue(tempValue);
         setSelectedBuyToken(tempToken);
-        console.log('swap token')
     };
 
     return (
-        <div className="bg-black text-white w-[400px] p-6 rounded-xl shadow-lg mx-auto relative border border-purple-800 
-                before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10">
+        <div
+            className="bg-black text-white w-[400px] p-6 rounded-xl shadow-lg mx-auto relative border border-purple-800
+                before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10"
+        >
             {/* Sell Section */}
             <div className="flex items-center justify-between mb-4">
                 <div>
@@ -49,7 +43,7 @@ function Swap() {
                 <div className="relative">
                     <button
                         className="flex items-center bg-gray-800 px-3 py-1.5 rounded-full"
-                        onClick={() => alert(`Selected token: ${selectedSellToken}`)}
+                        onClick={() => setSellDropdownOpen(!isSellDropdownOpen)}
                     >
                         <span>{selectedSellToken}</span>
                         <svg
@@ -67,6 +61,26 @@ function Swap() {
                             />
                         </svg>
                     </button>
+                    {/* Sell Dropdown */}
+                    {isSellDropdownOpen && (
+                        <ul className="absolute top-full mt-2 bg-gray-800 text-white rounded-md shadow-md z-10">
+                            {tokens.map(
+                                (token) =>
+                                    token !== selectedBuyToken && ( // Exclude the Buy token from Sell dropdown
+                                        <li
+                                            key={token}
+                                            className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+                                            onClick={() => {
+                                                setSelectedSellToken(token);
+                                                setSellDropdownOpen(false);
+                                            }}
+                                        >
+                                            {token}
+                                        </li>
+                                    )
+                            )}
+                        </ul>
+                    )}
                 </div>
             </div>
 
@@ -94,7 +108,6 @@ function Swap() {
                 </button>
             </div>
 
-
             {/* Buy Section */}
             <div className="flex items-center justify-between mb-4">
                 <div>
@@ -110,12 +123,12 @@ function Swap() {
                 <div className="relative">
                     <button
                         className="flex items-center bg-gray-800 px-3 py-1.5 rounded-full"
-                        onClick={() => alert(`Selected token: ${selectedBuyToken}`)}
+                        onClick={() => setBuyDropdownOpen(!isBuyDropdownOpen)}
                     >
-                        {selectedBuyToken}
+                        <span>{selectedBuyToken}</span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="w-4 h-4 inline ml-1"
+                            className="w-4 h-4 ml-1"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -128,18 +141,24 @@ function Swap() {
                             />
                         </svg>
                     </button>
-                    {/* Dropdown for tokens */}
-                    {tokens.length > 0 && (
+                    {/* Buy Dropdown */}
+                    {isBuyDropdownOpen && (
                         <ul className="absolute top-full mt-2 bg-gray-800 text-white rounded-md shadow-md z-10">
-                            {tokens.map((token, index) => (
-                                <li
-                                    key={index}
-                                    className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
-                                    onClick={() => setSelectedBuyToken(token)}
-                                >
-                                    {token}
-                                </li>
-                            ))}
+                            {tokens.map(
+                                (token) =>
+                                    token !== selectedSellToken && ( // Exclude the Sell token from Buy dropdown
+                                        <li
+                                            key={token}
+                                            className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+                                            onClick={() => {
+                                                setSelectedBuyToken(token);
+                                                setBuyDropdownOpen(false);
+                                            }}
+                                        >
+                                            {token}
+                                        </li>
+                                    )
+                            )}
                         </ul>
                     )}
                 </div>
@@ -148,17 +167,16 @@ function Swap() {
             {/* Action Button */}
             <button
                 onClick={() =>
-                    alert(`Swapping ${sellValue} ${selectedSellToken} for ${buyValue} ${selectedBuyToken}`)
+                    alert(
+                        `Swapping ${sellValue} ${selectedSellToken} for ${buyValue} ${selectedBuyToken}`
+                    )
                 }
-                className="w-full text-center text-white  mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
+                className="w-full text-center text-white mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
             >
-
                 Swap
             </button>
         </div>
     );
-
-};
-
+}
 
 export default Swap;
