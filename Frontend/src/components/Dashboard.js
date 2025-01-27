@@ -1,15 +1,24 @@
 import React, { useState } from 'react'
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+import clsx from 'clsx'
+import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useFhevm } from '../hooks/FHEhook';
 import { TOKEN_CONTRACT } from '../constants/contracts';
-
 import { ERC_CONTRACT_ABI } from '../ABI/ERC20ABI';
 import { ethers } from 'ethers';
-
+import toast from 'react-hot-toast';
 
 function Dashboard() {
+    const people = [
+        { id: 1, name: 'pEUR' },
+        { id: 2, name: 'pUSD' },
+        { id: 3, name: 'pGPB' },
 
+    ]
 
     const [selectedToken, setSelectedToken] = useState('pEUR'); // Default token as EUR
+    const [selected, setSelected] = useState(people[0]); // Default token as EUR
+
     const [balance, setBalance] = useState(null);
     const { instance, loading } = useFhevm();
 
@@ -24,15 +33,21 @@ function Dashboard() {
         const eip712 = instance.createEIP712(publicKey, contractAddress);
         const params = [signer.address, JSON.stringify(eip712)];
         // TODO : to fix error handling
-        const signature = await window.ethereum.request({ method: "eth_signTypedData_v4", params });
-
-
-        const handle = await contract.balanceOf(signer.address); // returns the handle of hte ciphertext as a uint256 (bigint)
-
-        // handle decrypting
         try {
+            const signature = await window.ethereum.request({ method: "eth_signTypedData_v4", params });
+            const handle = await contract.balanceOf(signer.address); // returns the handle of hte ciphertext as a uint256 (bigint)
+            let myBalance = 0
+            await toast.promise(
+                (async () => {
+                    myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
 
-            const myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
+                })(),
+                {
+                    loading: 'Decrypting balance...',
+                    success: 'Decryption successful! ',
+                    error: 'An error occurred while decrypting 😢',
+                }
+            );
             setBalance(Number(myBalance))
 
         }
@@ -49,24 +64,39 @@ function Dashboard() {
             <h1 className="text-2xl font-semibold text-white text-center">Token Balance</h1>
             <div className="flex items-center space-x-4">
                 {/* Stylish Token Selector */}
-                <div className="flex-1">
-                    <label
-                        htmlFor="tokens"
-                        className="block mb-2 text-sm font-medium text-white"
+                <Listbox value={selected} onChange={setSelected}>
+                    <ListboxButton
+                        className={clsx(
+                            'relative block w-3/4 rounded-lg bg-black border border-purple-800 mt-6 py-2 pr-8 pl-4 text-left text-sm/6 text-white',
+                            'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black'
+                        )}
                     >
-                        Select Token
-                    </label>
-                    <select
-                        id="tokens"
-                        value={selectedToken}
-                        onChange={(e) => setSelectedToken(e.target.value)}
-                        className="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 shadow-sm transition duration-300"
+                        {selected.name}
+                        <ChevronDownIcon
+                            className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+                            aria-hidden="true"
+                        />
+                    </ListboxButton>
+                    <ListboxOptions
+                        anchor="bottom"
+                        transition
+                        className={clsx(
+                            'w-[var(--button-width)] rounded-xl border border-violet-600 bg-black p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none',
+                            'transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0'
+                        )}
                     >
-                        <option value="pEUR">Private EURO (pEUR)</option>
-                        <option value="pUSD">Private USD (pUSD)</option>
-                        <option value="pGBP">Private GBP (pGBP)</option>
-                    </select>
-                </div>
+                        {people.map((person) => (
+                            <ListboxOption
+                                key={person.name}
+                                value={person}
+                                className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-white/10"
+                            >
+                                <CheckIcon className="invisible size-4 fill-white group-data-[selected]:visible" />
+                                <div className="text-sm/6 text-white">{person.name}</div>
+                            </ListboxOption>
+                        ))}
+                    </ListboxOptions>
+                </Listbox>
 
                 {/* Check Balance Button */}
                 <button
