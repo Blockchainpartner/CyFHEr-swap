@@ -1,6 +1,4 @@
 import { expect } from "chai";
-import { network } from "hardhat";
-
 import { createInstance } from "../instance";
 import { reencryptEuint64 } from "../reencrypt";
 import { getSigners, initSigners } from "../signers";
