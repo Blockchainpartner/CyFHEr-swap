@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import clsx from 'clsx'
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid'
-import { useFhevm } from '../hooks/FHEhook';
+import { FhenixClient } from 'fhenixjs';
+
 import { TOKEN_CONTRACT } from '../constants/contracts';
-import { ERC_CONTRACT_ABI } from '../ABI/ERC20ABI';
+import { ERC_CONTRACT_ABI } from '../ABI/FHERC20ABI';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 
@@ -19,28 +20,28 @@ function Dashboard() {
     const [selectedToken, setSelectedToken] = useState('pEUR'); // Default token as EUR
 
     const [balance, setBalance] = useState(null);
-    const { instance, loading } = useFhevm();
 
     const handleCheckBalance = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
+        const client = new FhenixClient({ provider });
+
         console.log(selectedToken)
         const contractAddress = TOKEN_CONTRACT[selectedToken];
         const contractABI = ERC_CONTRACT_ABI;
-        // these should be generated only once and stored in the app 
-        const { publicKey, privateKey } = instance.generateKeypair();
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
-        const eip712 = instance.createEIP712(publicKey, contractAddress);
-        const params = [signer.address, JSON.stringify(eip712)];
         // TODO : to fix error handling
         try {
-            const signature = await window.ethereum.request({ method: "eth_signTypedData_v4", params });
-            const handle = await contract.balanceOf(signer.address); // returns the handle of hte ciphertext as a uint256 (bigint)
-            let myBalance = 0
+            const permit = await client.generatePermit(contractAddress);
+            const permission = client.extractPermitPermission(permit);
+            let myBalanceEncrypted = 0
             await toast.promise(
                 (async () => {
-                    myBalance = await instance.reencrypt(handle, privateKey, publicKey, signature, contractAddress, signer.address);
-                    setBalance(Number(myBalance))
+                    myBalanceEncrypted = await contract.balanceOf(signer.address, permission);
+                    const myBalance = client.unseal(contractAddress, myBalanceEncrypted);
+                    const decimals = await contract.decimals()
+
+                    setBalance(Number(myBalance) / (10 ** Number(decimals)))
 
                 })(),
                 {

@@ -7,7 +7,6 @@ import Dashboard from "./components/Dashboard";
 import Swap from "./components/Swap";
 import Faucet from "./components/Faucet";
 import ProvideLiquidity from "./components/ProvideLiquidity";
-import { FhevmProvider } from "./context/FhevmProvider";
 import logo from "./assets/logo.png";
 import { Toaster } from 'react-hot-toast';
 import walletGif from "./assets/wallet.gif";
@@ -24,7 +23,6 @@ function App() {
 
         if (accounts.length > 0) {
           setIsWalletConnected(true);
-          console.log(accounts[0]);
         } else {
           setIsWalletConnected(false);
         }
@@ -111,33 +109,31 @@ function App() {
 
         <div className="flex flex-row h-[calc(100vh-64px)]">
           <Presentation />
-          <FhevmProvider>
 
-            <div className="flex flex-col items-center justify-center w-3/4 space-y-6">
-              {isWalletConnected ? (
-                <>
-                  <Routes>
-                    <Route path="/swap" element={<Swap />} />
-                    <Route path="/provide-liquidity" element={<ProvideLiquidity />} />
-                    <Route path="/faucet" element={<Faucet />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/" element={<Swap />} /> {/* Default Route */}
-                  </Routes>
-                </>
-              ) : (
-                <>
-                  <div className="relative flex w-full flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center w-3/4 space-y-6">
+            {isWalletConnected ? (
+              <>
+                <Routes>
+                  <Route path="/swap" element={<Swap />} />
+                  <Route path="/provide-liquidity" element={<ProvideLiquidity />} />
+                  <Route path="/faucet" element={<Faucet />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/" element={<Swap />} /> {/* Default Route */}
+                </Routes>
+              </>
+            ) : (
+              <>
+                <div className="relative flex w-full flex-col items-center justify-center">
 
-                    <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
-                      Connect wallet
-                    </p>
-                    <img src={walletGif} alt="Wallet Animation" className="w-1/5 h-auto" />
+                  <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
+                    Connect wallet
+                  </p>
+                  <img src={walletGif} alt="Wallet Animation" className="w-1/5 h-auto" />
 
-                  </div>
-                </>
-              )}
-            </div>
-          </FhevmProvider>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         <Toaster position="bottom-center"
           reverseOrder={false} />
