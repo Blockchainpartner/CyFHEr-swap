@@ -25,8 +25,8 @@ function Swap() {
 
     return (
         <div
-            className="bg-black text-white w-[400px] p-6 rounded-xl shadow-lg mx-auto relative border border-purple-800
-                before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10"
+            className="bg-black md:ml-10 text-white md:w-3/4 p-6 rounded-xl shadow-lg relative border border-purple-800
+            before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10"
         >
             {/* Sell Section */}
             <div className="flex items-center justify-between mb-4">
@@ -85,7 +85,7 @@ function Swap() {
             </div>
 
             {/* Divider */}
-            <div className="flex justify-center items-center my-4 relative">
+            < div className="flex justify-center items-center my-4 relative" >
                 <div className="w-full h-px bg-gray-700" />
                 <button
                     onClick={handleSwap}
@@ -109,7 +109,7 @@ function Swap() {
             </div>
 
             {/* Buy Section */}
-            <div className="flex items-center justify-between mb-4">
+            < div className="flex items-center justify-between mb-4" >
                 <div>
                     <label className="text-sm text-gray-400">Buy</label>
                     <input
@@ -165,7 +165,7 @@ function Swap() {
             </div>
 
             {/* Action Button */}
-            <button
+            < button
                 onClick={() =>
                     alert(
                         `Swapping ${sellValue} ${selectedSellToken} for ${buyValue} ${selectedBuyToken}`
@@ -176,6 +176,7 @@ function Swap() {
                 Swap
             </button>
         </div>
+
     );
 }
 

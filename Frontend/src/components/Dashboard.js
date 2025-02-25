@@ -25,6 +25,7 @@ function Dashboard() {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const client = new FhenixClient({ provider });
+        console.log(provider)
 
         console.log(selectedToken)
         const contractAddress = TOKEN_CONTRACT[selectedToken];
@@ -52,25 +53,25 @@ function Dashboard() {
             );
         }
         catch (error) { console.error(error) }
-    };
+    }
 
     const OnChangeToken = (value) => {
-        if (selectedToken != value) {
+        if (selectedToken !== value) {
             setBalance(null);
 
             setSelectedToken(value);
         }
     }
     return (
-        <div className="bg-black text-white w-1/2  px-10 py-6 rounded-xl shadow-lg mx-auto relative border border-purple-800 
+        <div className="md:w-3/5 w-full bg-black text-white  px-5 py-6 rounded-xl shadow-lg  relative border border-purple-800 
         before:absolute before:inset-0 before:rounded-xl before:blur-lg before:bg-purple-600 before:opacity-50 before:-z-10">
             <h1 className="text-2xl font-semibold text-white text-center">Token Balance</h1>
-            <div className="flex items-center space-x-4">
+            <div className="flex  items-center space-x-4">
                 {/* Stylish Token Selector */}
                 <Listbox value={selectedToken} onChange={OnChangeToken}>
                     <ListboxButton
                         className={clsx(
-                            'relative block w-3/4 rounded-lg bg-black border border-purple-800 mt-6 py-2 pr-8 pl-4 text-left text-sm/6 text-white',
+                            'relative block w-2/5 rounded-lg bg-black border border-purple-800 mt-6 py-2 pr-8 pl-4 text-left text-sm/6 text-white',
                             'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black'
                         )}
                     >
@@ -104,7 +105,7 @@ function Dashboard() {
                 {/* Check Balance Button */}
                 <button
                     onClick={handleCheckBalance}
-                    className="flex-none mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
+                    className="w-3/5 mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white text-small font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
                 >
                     Decrypt Balance
                 </button>

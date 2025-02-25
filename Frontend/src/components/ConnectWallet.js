@@ -52,7 +52,7 @@ function ConnectWallet({ isConnected }) {
 
 
         }
-    }, []); // The empty array ensures this effect runs only once on mount
+    }, [isConnected]); // The empty array ensures this effect runs only once on mount
 
     return (
         <div className=" text-white rounded-lg transition-colors duration-300">
