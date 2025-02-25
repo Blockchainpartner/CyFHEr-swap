@@ -13,36 +13,23 @@ import walletGif from "./assets/wallet.gif";
 
 function App() {
 
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-
-  const checkIfWalletIsConnected = async () => {
-    try {
-      // Check if window.ethereum is available (MetaMask)
-      if (window.ethereum) {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.listAccounts();
-
-        if (accounts.length > 0) {
-          setIsWalletConnected(true);
-        } else {
-          setIsWalletConnected(false);
-        }
-      }
-    } catch (error) {
-      console.error("Error checking wallet connection:", error);
-    }
-  };
-
-
-  useEffect(() => {
-    //TODO : fix page reload checking 
-    checkIfWalletIsConnected();
-  }, []);
+  const [isWalletConnected, setIsWalletConnected] = useState(() => {
+    const storedWallet = localStorage.getItem("walletAddress");
+    console.log(storedWallet)
+    return storedWallet ? true : false;
+  });
 
 
   const handleWalletConnect = (connected) => {
-    setIsWalletConnected(connected);
+    if (connected) {
+      setIsWalletConnected(true);
+      localStorage.setItem("walletAddress", "true"); // Store connection status
+    } else {
+      setIsWalletConnected(false);
+      localStorage.removeItem("walletAddress"); // Remove from localStorage on disconnect
+    }
   };
+
   return (
     <Router>
       <div className="absolute inset-0 -z-10 h-screen w-full items-center px-5  [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]  ">

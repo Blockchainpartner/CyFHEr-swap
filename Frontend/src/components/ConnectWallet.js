@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
 function ConnectWallet({ isConnected }) {
-    const [account, setAccount] = useState(null);
+    const [account, setAccount] = useState(() => {
+        const storedWallet = localStorage.getItem("walletAddress");
+        const connectedWallet = localStorage.getItem("connected");
+
+        console.log(storedWallet)
+        return connectedWallet ? storedWallet : null;
+    })
     const [error, setError] = useState(null);
 
     const connectWallet = async () => {
@@ -12,6 +18,9 @@ function ConnectWallet({ isConnected }) {
             setAccount(accounts[0]);
             isConnected(true);
             setError(null);
+            localStorage.setItem("walletAddress", accounts[0]); // Store connection status
+            localStorage.setItem("connected", "true");
+
         } catch (error) {
             isConnected(false);
             if (error.message.includes("invalid EIP-1193 provider")) {
@@ -36,16 +45,18 @@ function ConnectWallet({ isConnected }) {
                     isConnected(false);
                     setAccount(null); // Handle disconnection
                 } else {
-                    console.log("Account changed:", accounts[0]);
                     setAccount(accounts[0]); // Handle account change
+                    localStorage.setItem("walletAddress", accounts[0]);
+
                 }
             };
-
             // Listen for disconnection
             const handleDisconnect = (error) => {
                 console.log("Disconnected from the wallet:", error);
                 setAccount(null);
                 setError(null); // Handle disconnection
+                localStorage.removeItem("walletAddress");
+                localStorage.removeItem("connected");
             };
             window.ethereum.on("accountsChanged", handleAccountsChanged);
             window.ethereum.on("disconnect", handleDisconnect);
