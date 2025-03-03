@@ -75,11 +75,13 @@ describe("CyfherFactory", function () {
 
   it("Should emit PairCreated event with the correct values", async function () {
     const tx = await factory.createPair(token1Address, token2Address);
-
-    const receipt = await tx.wait();
+    [token1Address, token2Address] = [token1Address, token2Address].sort();
+        const receipt = await tx.wait();
     if (receipt != null) {
       const pairAddress = receipt.logs[0].address;
       // Check event emission
+      console.log(token1Address)
+      console.log(token2Address)
       await expect(tx)
         .to.emit(factory, "PairCreated")
         .withArgs(token1Address, token2Address, pairAddress, 1);

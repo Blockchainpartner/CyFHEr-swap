@@ -170,14 +170,17 @@ contract PFHERC20 is Ownable2Step, Permissioned {
     function burn(
         address from,
         inEuint32 memory encryptedAmount
-    ) public onlyOwner {
+    ) public virtual onlyOwner {
         if (from == address(0)) {
             revert ERC20InvalidReceiver(address(0));
         }
         euint32 amount = FHE.asEuint32(encryptedAmount);
-        _transferImpl(from, address(0), amount);
+        _burn(from, amount);
+    }
+    function _burn(address from, euint32 encryptedAmount) internal {
+        _transferImpl(from, address(0), encryptedAmount);
         // this can leak informations
-        _totalSupply = _totalSupply - amount;
+        _totalSupply = _totalSupply - encryptedAmount;
     }
 
     function transfer(
@@ -185,11 +188,18 @@ contract PFHERC20 is Ownable2Step, Permissioned {
         inEuint32 calldata encryptedAmount,
         Permission memory permission
     ) public onlyPermitted(permission, msg.sender) returns (euint32) {
-        return _transfer(to, FHE.asEuint32(encryptedAmount));
+        return _transferImpl(msg.sender, to, FHE.asEuint32(encryptedAmount));
+    }
+    function transfer(
+        address to,
+        euint32 value
+    ) external virtual returns (bool) {
+        _transferImpl(msg.sender, to, value);
+        return true;
     }
 
     // Transfers an amount from the message sender address to the `to` address.
-    function _transfer(address to, euint32 amount) internal returns (euint32) {
+    function _transfer(address to, euint32 amount) external returns (euint32) {
         return _transferImpl(msg.sender, to, amount);
     }
 

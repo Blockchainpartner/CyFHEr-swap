@@ -104,7 +104,7 @@ describe("CyfherAMM", function () {
     console.log(token1Address)
     console.log(token2Address)
 
-    const tx5 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB);
+    const tx5 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB, signer1);
     const receipt = await tx5.wait();
 
 
@@ -115,7 +115,6 @@ describe("CyfherAMM", function () {
 /*
   describe("Deployment testing", function () {
     it("should mint erc20 token to user", async function () {
-      const transaction = await this.EURContract.mint(this.signers.alice, 1000);
       await transaction.wait();
 
       // Reencrypt Alice's balance

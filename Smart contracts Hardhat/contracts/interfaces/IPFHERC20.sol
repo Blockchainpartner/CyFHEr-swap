@@ -4,7 +4,7 @@ pragma solidity >=0.8.19 <0.9.0;
 import {Permission} from "@fhenixprotocol/contracts/access/Permissioned.sol";
 import "@fhenixprotocol/contracts/FHE.sol";
 
-interface ICyfherERC20 {
+interface IPFHERC20 {
     function name() external view returns (string memory);
     function symbol() external view returns (string memory);
     function decimals() external view returns (uint8);
@@ -28,6 +28,10 @@ interface ICyfherERC20 {
         inEuint32 calldata encryptedAmount,
         Permission memory permission
     ) external returns (euint32);
+    function transfer(
+        address to,
+        euint32 encryptedAmount
+    ) external returns (euint32);
     function transferFrom(
         address from,
         address to,
@@ -42,5 +46,5 @@ interface ICyfherERC20 {
         address to,
         euint32 value,
         Permission memory permission
-    ) external virtual returns (euint32);
+    ) external returns (euint32);
 }
