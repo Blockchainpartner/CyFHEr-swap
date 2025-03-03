@@ -145,9 +145,9 @@ contract CyfherPair is PFHERC20 {
         // distribution
         // require(amount0 > 0 && amount1 > 0, "UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED");
         _burn(address(this), liquidity);
-        IPFHERC20(address(_token0)).transfer(to, amount0);
+        IPFHERC20(address(_token0))._transfer(amount0, to);
         // _safeTransfer(_token1, to, amount1);
-        IPFHERC20(address(_token1)).transfer(to, amount1);
+        IPFHERC20(address(_token1))._transfer(amount1, to);
         balance0 = IPFHERC20(_token0).unsafeBalanceOf(address(this));
         balance1 = IPFHERC20(_token1).unsafeBalanceOf(address(this));
 
@@ -175,12 +175,12 @@ contract CyfherPair is PFHERC20 {
             address _token1 = token1;
             //require(to != _token0 && to != _token1, "UniswapV2: INVALID_TO");
             //if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
-            PFHERC20(_token0).transfer(to, amount0Out);
+            IPFHERC20(_token0)._transfer(amount0Out, to);
             //if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
-            PFHERC20(_token1).transfer(to, amount1Out);
+            IPFHERC20(_token1)._transfer(amount1Out, to);
             // if (data.length > 0) IUniswapV2Callee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);
-            balance0 = PFHERC20(_token0).unsafeBalanceOf(address(this));
-            balance1 = PFHERC20(_token1).unsafeBalanceOf(address(this));
+            balance0 = IPFHERC20(_token0).unsafeBalanceOf(address(this));
+            balance1 = IPFHERC20(_token1).unsafeBalanceOf(address(this));
         }
         ebool balance0GtReserve0MinusAmount0Out = FHE.gt(
             balance0,

@@ -70,23 +70,22 @@ describe("TokenDistributor", function () {
     );
 
 
+
     const transfer = await PFHERC20.connect(signer).transferOwnership(TokenDistributorAddress);
     await transfer.wait();
-    const accept = await TokenDistributor.connect(signer).acceptOwnership(PFHERC20Address);
+     const accept = await TokenDistributor.connect(signer).acceptOwnership(PFHERC20Address);
     await accept.wait();
+
     const claim = await TokenDistributor.connect(signer).claim(PFHERC20Address);
     await claim.wait();
-
     const balanceEncryptedAfter = await PFHERC20.connect(signer).balanceOf(signer, permission);
     const balanceAfter = fhenixjs.unseal(
       PFHERC20Address,
       balanceEncryptedAfter,
       signer.address,
     );
-
-
     expect(balanceBefore).to.equal(0);
-    expect(balanceAfter).to.equal(100);
+    expect(balanceAfter).to.equal(100000); 
   });
 });
 

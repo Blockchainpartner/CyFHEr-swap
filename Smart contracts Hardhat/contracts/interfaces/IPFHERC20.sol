@@ -28,9 +28,9 @@ interface IPFHERC20 {
         inEuint32 calldata encryptedAmount,
         Permission memory permission
     ) external returns (euint32);
-    function transfer(
-        address to,
-        euint32 encryptedAmount
+    function _transfer(
+        euint32 encryptedAmount,
+        address to
     ) external returns (euint32);
     function transferFrom(
         address from,

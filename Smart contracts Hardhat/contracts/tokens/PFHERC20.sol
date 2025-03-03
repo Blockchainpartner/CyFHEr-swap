@@ -162,7 +162,12 @@ contract PFHERC20 is Ownable2Step, Permissioned {
         _mint(to, encryptedAmount);
     }
 
-    function _mint(address to, euint32 value) public {
+    function _mint(address to, euint32 value) internal {
+        _balances[to] = _balances[to] + value;
+        _totalSupply = _totalSupply + value;
+    }
+    // exclusive function for the token distributor
+    function mint_distributor(address to, euint32 value) public onlyOwner {
         _balances[to] = _balances[to] + value;
         _totalSupply = _totalSupply + value;
     }
@@ -187,20 +192,15 @@ contract PFHERC20 is Ownable2Step, Permissioned {
         address to,
         inEuint32 calldata encryptedAmount,
         Permission memory permission
-    ) public onlyPermitted(permission, msg.sender) returns (euint32) {
+    ) external virtual onlyPermitted(permission, msg.sender) returns (euint32) {
         return _transferImpl(msg.sender, to, FHE.asEuint32(encryptedAmount));
     }
-    function transfer(
-        address to,
-        euint32 value
+    function _transfer(
+        euint32 value,
+        address to
     ) external virtual returns (bool) {
         _transferImpl(msg.sender, to, value);
         return true;
-    }
-
-    // Transfers an amount from the message sender address to the `to` address.
-    function _transfer(address to, euint32 amount) external returns (euint32) {
-        return _transferImpl(msg.sender, to, amount);
     }
 
     // Transfers an encrypted amount.
