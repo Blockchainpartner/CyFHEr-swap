@@ -5,11 +5,10 @@ pragma solidity ^0.8.24;
 import {ICyfherFactory} from "../interfaces/ICyfherFactory.sol";
 import {ICyfherPair} from "../interfaces/ICyfherPair.sol";
 import {IPFHERC20} from "../interfaces/IPFHERC20.sol";
+import {PFHERC20} from "../tokens/PFHERC20.sol";
+import {CyfherSwapLibrary} from "../libraries/CyfherSwapLibrary.sol";
 import {Permissioned, Permission} from "@fhenixprotocol/contracts/access/Permissioned.sol";
 import "@fhenixprotocol/contracts/FHE.sol";
-import "@fhenixprotocol/contracts/utils/debug/Console.sol";
-import {PFHERC20} from "../tokens/PFHERC20.sol";
-
 import "@fhenixprotocol/contracts/utils/debug/Console.sol";
 
 contract CyfherPair is PFHERC20 {
@@ -72,20 +71,7 @@ contract CyfherPair is PFHERC20 {
         euint32 _reserve0,
         euint32 _reserve1
     ) private {
-        // require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, "UniswapV2: OVERFLOW");
         uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
-        // unchecked {
-        //     uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
-        //     if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
-        //         // * never overflows, and + overflow is desired
-        //         price0CumulativeLast += uint256(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed;
-        //         price1CumulativeLast += uint256(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) * timeElapsed;
-        //     }
-        // }
-        // reserve0 = uint112(balance0);
-        // reserve1 = uint112(balance1);
-        // blockTimestampLast = blockTimestamp;
-        // emit Sync(reserve0, reserve1);
         reserve0 = balance0;
         reserve1 = balance1;
         blockTimestampLast = blockTimestamp;
@@ -95,25 +81,28 @@ contract CyfherPair is PFHERC20 {
     function mint(address to) external lock returns (euint32 liquidity) {
         (euint32 _reserve0, euint32 _reserve1, ) = getReserves(); // gas savings
         // make a get balance unsafe function until i implement eip 1272
-
         euint32 balance0 = IPFHERC20(token0).unsafeBalanceOf(address(this));
         euint32 balance1 = IPFHERC20(token1).unsafeBalanceOf(address(this));
         euint32 amount0 = FHE.sub(balance0, _reserve0);
         euint32 amount1 = FHE.sub(balance1, _reserve1);
-        // bool feeOn = _mintFee(_reserve0, _reserve1);
         euint32 totalSupply = _totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
         ebool totalSupplyIsZeroEncrypted = FHE.eq(
             totalSupply,
             FHE.asEuint32(0)
         );
+
         // decrypting if totalsupply is 0 or not  does not reveal any sensetive information ,doing if else statement will save gas
         bool totalSupplyIsZero = FHE.decrypt(totalSupplyIsZeroEncrypted);
         if (totalSupplyIsZero) {
             _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
             // we should use square root here
             // Edge case if amount 0 and amount 1 are 0 when adding liquidity this will revert or underflow
-            liquidity = (amount0 * amount1) - MINIMUM_LIQUIDITY;
-            //Console.log(FHE.decrypt(liquidity));
+            liquidity =
+                CyfherSwapLibrary.binarySearchEncryptedSquareRoot(
+                    FHE.mul(amount0, amount1)
+                ) -
+                MINIMUM_LIQUIDITY;
+            Console.log(FHE.decrypt(liquidity));
         } else {
             liquidity = FHE.min(
                 (amount0 * _totalSupply) / _reserve0,

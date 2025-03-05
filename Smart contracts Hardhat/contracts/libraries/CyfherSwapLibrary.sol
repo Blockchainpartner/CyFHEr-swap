@@ -145,7 +145,7 @@ library CyfherSwapLibrary {
 
     function binarySearchEncryptedSquareRoot(
         euint32 x
-    ) public pure returns (euint32) {
+    ) internal pure returns (euint32) {
         ebool isZeroValue = FHE.eq(x, FHE.asEuint32(0));
         euint32 x_safe = FHE.select(isZeroValue, FHE.asEuint32(1), x);
 
