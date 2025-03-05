@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, NavLink, Route, Routes } from "react-router-dom";
-import { ethers } from "ethers";
 import ConnectWallet from "./components/ConnectWallet";
 import Presentation from "./components/Presentation";
 import Dashboard from "./components/Dashboard";
 import Swap from "./components/Swap";
 import Faucet from "./components/Faucet";
-import ProvideLiquidity from "./components/ProvideLiquidity";
+import Liquidity from "./components/Liquidity";
 import logo from "./assets/logo.png";
 import { Toaster } from 'react-hot-toast';
 import walletGif from "./assets/wallet.gif";
+import { motion } from "motion/react"
+
 
 function App() {
-
   const [isWalletConnected, setIsWalletConnected] = useState(() => {
     const storedWallet = localStorage.getItem("walletAddress");
     console.log(storedWallet)
@@ -31,6 +31,7 @@ function App() {
   };
 
   return (
+
     <Router>
       <div className="absolute inset-0 -z-10 h-screen w-full items-center px-5  [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]  ">
         <nav className="relative px-6 py-9 bg-grey text-white shadow-lg">
@@ -45,7 +46,7 @@ function App() {
 
           {/* Fixed Navigation Links Container - centered */}
           <div className="absolute left-1/2 transform -translate-x-1/2 top-0 flex space-x-6 text-lg pt-5">
-            {["swap", "provide-liquidity", "faucet", "dashboard"].map((route) => (
+            {["Swap", "Liquidity", "Faucet", "Dashboard"].map((route) => (
               <NavLink
                 key={route}
                 to={`/${route}`}
@@ -65,40 +66,45 @@ function App() {
           </div>
 
         </nav>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}>
+          <div className="flex md:flex-row md:h-[calc(90vh)] mt-20 md:mt-1 flex-col items-center">
 
-        <div className="flex md:flex-row md:h-[calc(90vh)] mt-20 md:mt-1 flex-col items-center">
-          <Presentation />
+            <Presentation />
 
-          <div className="flex flex-col items-center justify-center md:w-3/4 space-y-6">
-            {isWalletConnected ? (
-              <>
-                <Routes>
-                  <Route path="/swap" element={<Swap />} />
-                  <Route path="/provide-liquidity" element={<ProvideLiquidity />} />
-                  <Route path="/faucet" element={<Faucet />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/" element={<Swap />} /> {/* Default Route */}
-                </Routes>
-              </>
-            ) : (
-              <>
-                <div className="relative flex w-full flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center md:w-3/4 space-y-6">
+              {isWalletConnected ? (
+                <>
+                  <Routes>
+                    <Route path="/swap" element={<Swap />} />
+                    <Route path="/liquidity" element={<Liquidity />} />
+                    <Route path="/faucet" element={<Faucet />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/" element={<Swap />} /> {/* Default Route */}
+                  </Routes>
+                </>
+              ) : (
+                <>
+                  <div className="relative flex w-full flex-col items-center justify-center">
 
-                  <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
-                    Connect wallet
-                  </p>
-                  <img src={walletGif} alt="Wallet Animation" className="w-1/5 h-auto" />
+                    <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
+                      Connect wallet
+                    </p>
+                    <img src={walletGif} alt="Wallet Animation" className="w-1/5 h-auto" />
 
-                </div>
-              </>
-            )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        </motion.div>
+
         <Toaster position="bottom-center"
           reverseOrder={false} />
       </div>
     </Router>
-
   );
 }
 
