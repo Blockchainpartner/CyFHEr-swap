@@ -52,11 +52,11 @@ const deployTokens: DeployFunction = async function (
 
   const pGPB = await deploy("PFHERC20", {
     from: deployer,
-    args: ["PrivateGPB", "pGPB", 3],
+    args: ["PrivateGPB", "pGBP", 3],
     log: true,
     autoMine: true,
   });
-  console.log("pGPB deployed with address : ", pGPB.address)
+  console.log("pGBP deployed with address : ", pGPB.address)
   const Distributer = await deploy("TokenDistributor", {
     from: deployer,
     args: [],
