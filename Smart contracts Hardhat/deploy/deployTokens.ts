@@ -7,7 +7,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
  *
  * @param hre HardhatRuntimeEnvironment object.
  */
-const deployCounter: DeployFunction = async function (
+const deployTokens: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment,
 ) {
   /*
@@ -34,7 +34,7 @@ const deployCounter: DeployFunction = async function (
     }
   }
 
-  const pEUR = await deploy("PFHERC20", {
+   const pEUR = await deploy("PFHERC20", {
     from: deployer,
     // Contract constructor arguments
     args: ["PrivateEUR", "pEUR", 3],
@@ -64,11 +64,13 @@ const deployCounter: DeployFunction = async function (
     autoMine: true,
   });
   console.log("Distributer deployed with address : ", Distributer.address)
+ 
+
 
 };
 
-export default deployCounter;
+export default deployTokens;
 
 // Tags are useful if you have multiple deploy files and only want to run one of them.
 // e.g. yarn deploy --tags Counter
-deployCounter.tags = ["Deployer"];
+deployTokens.tags = ["Tokens"];
