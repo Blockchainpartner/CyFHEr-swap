@@ -8,9 +8,8 @@ import {
 import clsx from "clsx";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { FhenixClient } from "fhenixjs";
-
-import { TOKEN_CONTRACT } from "../constants/contracts";
-import { ERC_CONTRACT_ABI } from "../ABI/FHERC20ABI";
+import { ROUTER, TOKEN_CONTRACT } from "../constants/contracts";
+import { ROUTER_CONTRACT_ABI } from "../ABI/RouterABI";
 import { ethers } from "ethers";
 import toast from "react-hot-toast";
 
@@ -58,18 +57,40 @@ function Liquidity() {
   const [amountRemove, setAmountRemove] = useState("");
 
   const handleAddLiquidity = async () => {
-    console.log(
-      `Adding liquidity: ${amountA} ${tokenA.name} + ${amountB} ${tokenB.name}`
-    );
-  };
-  const handleRemoveLiquidity = async () => {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const client = new FhenixClient({ provider });
-    console.log(provider);
-    console.log(
-      `Adding liquidity: ${amountA} ${tokenA.name} + ${amountB} ${tokenB.name}`
+
+    const routerContract = new ethers.Contract(
+      ROUTER,
+      ROUTER_CONTRACT_ABI,
+      signer
     );
+    //TODO: add decimal query
+    const EncryptedAmountA = await client.encrypt_uint32(
+      Number(amountA) * 10 ** 3
+    );
+    const EncryptedAmountB = await client.encrypt_uint32(
+      Number(amountB) * 10 ** 3
+    );
+    const permitA = await client.generatePermit(TOKEN_CONTRACT[tokenA.name]);
+    const permissionA = client.extractPermitPermission(permitA);
+    const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
+    const permissionB = client.extractPermitPermission(permitB);
+    const tx = await routerContract.addLiquidity(
+      TOKEN_CONTRACT[tokenA.name],
+      TOKEN_CONTRACT[tokenB.name],
+      EncryptedAmountA,
+      EncryptedAmountB,
+      permissionA,
+      permissionB,
+      signer.address
+    );
+    await tx.wait();
+    toast.success("Liquidity added successfully");
+  };
+  const handleRemoveLiquidity = async () => {
+    //TODO: Implement handleRemoveLiquidity
   };
 
   const OnChangeTokenA = (value) => {
