@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, NavLink, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  NavLink,
+  Route,
+  Routes,
+} from "react-router-dom";
 import ConnectWallet from "./components/ConnectWallet";
 import Presentation from "./components/Presentation";
 import Dashboard from "./components/Dashboard";
@@ -7,18 +12,16 @@ import Swap from "./components/Swap";
 import Faucet from "./components/Faucet";
 import Liquidity from "./components/Liquidity";
 import logo from "./assets/logo.png";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import walletGif from "./assets/wallet.gif";
-import { motion } from "motion/react"
-
+import { motion } from "motion/react";
 
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(() => {
     const storedWallet = localStorage.getItem("walletAddress");
-    console.log(storedWallet)
+    console.log(storedWallet);
     return storedWallet ? true : false;
   });
-
 
   const handleWalletConnect = (connected) => {
     if (connected) {
@@ -31,7 +34,6 @@ function App() {
   };
 
   return (
-
     <Router>
       <div className="absolute inset-0 -z-10 h-screen w-full items-center px-5  [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]  ">
         <nav className="relative px-6 py-9 bg-grey text-white shadow-lg">
@@ -64,14 +66,13 @@ function App() {
           <div className="absolute right-0 top-0 flex items-center px-6 py-3">
             <ConnectWallet isConnected={handleWalletConnect} />
           </div>
-
         </nav>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}>
+          transition={{ duration: 1 }}
+        >
           <div className="flex md:flex-row md:h-[calc(90vh)] mt-20 md:mt-1 flex-col items-center">
-
             <Presentation />
 
             <div className="flex flex-col items-center justify-center md:w-3/4 space-y-6">
@@ -88,12 +89,14 @@ function App() {
               ) : (
                 <>
                   <div className="relative flex w-full flex-col items-center justify-center">
-
                     <p className="z-10 text-center text-3xl font-medium tracking-tighter text-white">
                       Connect wallet
                     </p>
-                    <img src={walletGif} alt="Wallet Animation" className="w-1/5 h-auto" />
-
+                    <img
+                      src={walletGif}
+                      alt="Wallet Animation"
+                      className="w-1/5 h-auto"
+                    />
                   </div>
                 </>
               )}
@@ -101,8 +104,7 @@ function App() {
           </div>
         </motion.div>
 
-        <Toaster position="bottom-center"
-          reverseOrder={false} />
+        <Toaster position="bottom-center" reverseOrder={false} />
       </div>
     </Router>
   );
