@@ -8,8 +8,11 @@ import {
 import clsx from "clsx";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { FhenixClient } from "fhenixjs";
-import { ROUTER, TOKEN_CONTRACT } from "../constants/contracts";
+import { FACTORY, ROUTER, TOKEN_CONTRACT } from "../constants/contracts";
 import { ROUTER_CONTRACT_ABI } from "../ABI/RouterABI";
+import { FACTORY_CONTRACT_ABI } from "../ABI/FactoryABI";
+import { ERC_CONTRACT_ABI } from "../ABI/FHERC20ABI";
+
 import { ethers } from "ethers";
 import toast from "react-hot-toast";
 
@@ -77,6 +80,20 @@ function Liquidity() {
     const permissionA = client.extractPermitPermission(permitA);
     const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
     const permissionB = client.extractPermitPermission(permitB);
+    const tokenA = new ethers.Contract(
+      TOKEN_CONTRACT[tokenA.name],
+      ERC_CONTRACT_ABI,
+      signer
+    );
+    const tokenB = new ethers.Contract(
+      TOKEN_CONTRACT[tokenB.name],
+      ERC_CONTRACT_ABI,
+      signer
+    );
+    tx = await tokenA.approve(ROUTER, EncryptedAmountA);
+    await tx.wait();
+    tx = await tokenB.approve(ROUTER, EncryptedAmountB);
+    await tx.wait();
     const tx = await routerContract.addLiquidity(
       TOKEN_CONTRACT[tokenA.name],
       TOKEN_CONTRACT[tokenB.name],
@@ -91,6 +108,51 @@ function Liquidity() {
   };
   const handleRemoveLiquidity = async () => {
     //TODO: Implement handleRemoveLiquidity
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const client = new FhenixClient({ provider });
+
+    const FactoryContract = new ethers.Contract(
+      FACTORY,
+      FACTORY_CONTRACT_ABI,
+      signer
+    );
+
+    const pair = await FactoryContract.allPairsLength();
+    console.log(pair);
+    const pairAddress = await FactoryContract.allPairs(Number(pair) - 1);
+    console.log(pairAddress);
+    const tokenA = new ethers.Contract(
+      TOKEN_CONTRACT[tokenA.name],
+      ERC_CONTRACT_ABI,
+      signer
+    );
+    const tokenB = new ethers.Contract(
+      TOKEN_CONTRACT[tokenB.name],
+      ERC_CONTRACT_ABI,
+      signer
+    );
+    const permitA = await client.generatePermit(TOKEN_CONTRACT[tokenA.name]);
+    const permissionA = client.extractPermitPermission(permitA);
+    const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
+    const permissionB = client.extractPermitPermission(permitB);
+    const EncryptedAmountA = await client.encrypt_uint32(
+      Number(amountA) * 10 ** 3
+    ); // TODO : to fix error handling
+    const EncryptedAmountB = await client.encrypt_uint32(
+      Number(amountB) * 10 ** 3
+    );
+
+    const permit = await client.generatePermit(pairAddress);
+    const permission = client.extractPermitPermission(permit);
+    const myBalanceEncrypted = await contract.balanceOf(
+      signer.address,
+      permission
+    );
+    const myBalance = client.unseal(pairAddress, myBalanceEncrypted);
+    const decimals = await contract.decimals();
+
+    console.log(Number(myBalance) / 10 ** Number(decimals));
   };
 
   const OnChangeTokenA = (value) => {
