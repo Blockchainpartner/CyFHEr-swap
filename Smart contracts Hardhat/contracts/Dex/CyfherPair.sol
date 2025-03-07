@@ -97,11 +97,8 @@ contract CyfherPair is PFHERC20 {
             _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
             // we should use square root here
             // Edge case if amount 0 and amount 1 are 0 when adding liquidity this will revert or underflow
-            liquidity =
-                CyfherSwapLibrary.binarySearchEncryptedSquareRoot(
-                    FHE.mul(amount0, amount1)
-                ) -
-                MINIMUM_LIQUIDITY;
+            // we assume that the user will add same amount of token0 and token1
+            liquidity = amount0 - MINIMUM_LIQUIDITY;
             Console.log(FHE.decrypt(liquidity));
         } else {
             liquidity = FHE.min(
