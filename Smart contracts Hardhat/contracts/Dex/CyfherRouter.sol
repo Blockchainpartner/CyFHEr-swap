@@ -40,8 +40,8 @@ contract CyfherRouter {
             tokenA,
             tokenB
         );
-
-        ebool reserveAEq0 = FHE.eq(reserveA, FHE.asEuint32(0));
+        (amountA, amountB) = (amountADesired, amountBDesired);
+        /*  ebool reserveAEq0 = FHE.eq(reserveA, FHE.asEuint32(0));
         ebool reserveBEq0 = FHE.eq(reserveB, FHE.asEuint32(0));
         // TO CHECK IF THIS CHANGE FROM "AND" OPERATOR TO "OR" OPERATOR INTRODUCES BREAKING CHANGES. Especially if first
         // liquidity provisioning is single sided
@@ -74,7 +74,7 @@ contract CyfherRouter {
                 amountBOptimal,
                 amountBDesired
             );
-        }
+        } */
     }
 
     function addLiquidity(
@@ -89,13 +89,12 @@ contract CyfherRouter {
         euint32 amountADesired = FHE.asEuint32(encryptedAmountADesired);
         euint32 amountBDesired = FHE.asEuint32(encryptedAmountBDesired);
         // creating the pair
+        if (ICyfherFactory(factory).getPair(tokenA, tokenB) == address(0)) {
+            ICyfherFactory(factory).createPair(tokenA, tokenB);
+        }
+        (amountA, amountB) = (amountADesired, amountBDesired);
 
-        (amountA, amountB) = _addLiquidity(
-            tokenA,
-            tokenB,
-            amountADesired,
-            amountBDesired
-        );
+        //_addLiquidity(tokenA, tokenB, amountADesired, amountBDesired);
         address pair = CyfherSwapLibrary.pairFor(factory, tokenA, tokenB);
         IPFHERC20(tokenA).unsafe_transferFrom(
             msg.sender,

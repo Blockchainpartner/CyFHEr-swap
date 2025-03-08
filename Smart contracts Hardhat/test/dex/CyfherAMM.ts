@@ -103,10 +103,10 @@ describe("CyfherAMM", function () {
     );
     let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(10);
 
-    let encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permission1);
-    let encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permission2);
-    let balanceA = await fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
-    let balanceB = await fhenixjs.unseal(token2Address, encrypted_balanceB, signer1.address);
+    let encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
+    let encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
+    let balanceA =  fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
+    let balanceB =  fhenixjs.unseal(token2Address, encrypted_balanceB, signer1.address);
     expect(balanceA).to.equal(100);
     expect(balanceB).to.equal(100);
 
@@ -147,7 +147,7 @@ describe("CyfherAMM", function () {
     const tx6 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB, signer1);
     await tx6.wait();
     ecryptedLpBalance = await pair.connect(signer1).balanceOf(signer1, permissionPair);
-    lpBalance = await fhenixjs.unseal(pairAddress, ecryptedLpBalance, signer1.address);
+    lpBalance =  fhenixjs.unseal(pairAddress, ecryptedLpBalance, signer1.address);
     expect(lpBalance).to.equal(14);
     encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
     encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);

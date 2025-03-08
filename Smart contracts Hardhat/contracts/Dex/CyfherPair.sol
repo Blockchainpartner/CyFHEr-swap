@@ -106,7 +106,7 @@ contract CyfherPair is PFHERC20 {
                 (amount1 * _totalSupply) / _reserve1
             );
         }
-        FHE.req(liquidity.gt(FHE.asEuint32(0)));
+        // FHE.req(liquidity.gt(FHE.asEuint32(0)));
         _mint(to, liquidity);
         _update(balance0, balance1, _reserve0, _reserve1);
     }
