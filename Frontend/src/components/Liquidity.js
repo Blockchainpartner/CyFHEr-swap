@@ -70,6 +70,7 @@ function Liquidity() {
       signer
     );
     //TODO: add decimal query
+    console.log(Number(amountA) * 10 ** 3);
     const EncryptedAmountA = await client.encrypt_uint32(
       Number(amountA) * 10 ** 3
     );
@@ -80,21 +81,8 @@ function Liquidity() {
     const permissionA = client.extractPermitPermission(permitA);
     const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
     const permissionB = client.extractPermitPermission(permitB);
-    const tokenA = new ethers.Contract(
-      TOKEN_CONTRACT[tokenA.name],
-      ERC_CONTRACT_ABI,
-      signer
-    );
-    const tokenB = new ethers.Contract(
-      TOKEN_CONTRACT[tokenB.name],
-      ERC_CONTRACT_ABI,
-      signer
-    );
-    tx = await tokenA.approve(ROUTER, EncryptedAmountA);
-    await tx.wait();
-    tx = await tokenB.approve(ROUTER, EncryptedAmountB);
-    await tx.wait();
-    const tx = await routerContract.addLiquidity(
+
+    const tx3 = await routerContract.addLiquidity(
       TOKEN_CONTRACT[tokenA.name],
       TOKEN_CONTRACT[tokenB.name],
       EncryptedAmountA,
@@ -103,9 +91,55 @@ function Liquidity() {
       permissionB,
       signer.address
     );
-    await tx.wait();
+    await tx3.wait();
     toast.success("Liquidity added successfully");
   };
+  const handleAddApproval = async () => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const client = new FhenixClient({ provider });
+    const EncryptedAmountA = await client.encrypt_uint32(
+      Number(amountA) * 10 ** 3
+    );
+    const EncryptedAmountB = await client.encrypt_uint32(
+      Number(amountB) * 10 ** 3
+    );
+    try {
+      await toast.promise(
+        (async () => {
+          const permitA = await client.generatePermit(TOKEN_CONTRACT[tokenA.name]);
+          const permissionA = client.extractPermitPermission(permitA);
+          const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
+          const permissionB = client.extractPermitPermission(permitB);
+          const tokenAContract = new ethers.Contract(
+            TOKEN_CONTRACT[tokenA.name],
+            ERC_CONTRACT_ABI,
+            signer
+          );
+          const tokenBContract = new ethers.Contract(
+            TOKEN_CONTRACT[tokenB.name],
+            ERC_CONTRACT_ABI,
+            signer
+          );
+          const tx1 = await tokenAContract.approve(ROUTER, EncryptedAmountA, permissionA);
+          await tx1.wait();
+          const tx2 = await tokenBContract.approve(ROUTER, EncryptedAmountB, permissionB);
+          await tx2.wait();
+        })(),
+        {
+          loading: "Excuting transactions",
+          success: "Approval successful! ",
+          error: "An error occurred while approving 😢",
+        }
+      );
+    }
+    catch (error) {
+      console.log(error);
+    }
+
+  }
+
+
   const handleRemoveLiquidity = async () => {
     //TODO: Implement handleRemoveLiquidity
     const provider = new ethers.BrowserProvider(window.ethereum);
@@ -122,12 +156,12 @@ function Liquidity() {
     console.log(pair);
     const pairAddress = await FactoryContract.allPairs(Number(pair) - 1);
     console.log(pairAddress);
-    const tokenA = new ethers.Contract(
+    const tokenAContract = new ethers.Contract(
       TOKEN_CONTRACT[tokenA.name],
       ERC_CONTRACT_ABI,
       signer
     );
-    const tokenB = new ethers.Contract(
+    const tokenBContract = new ethers.Contract(
       TOKEN_CONTRACT[tokenB.name],
       ERC_CONTRACT_ABI,
       signer
@@ -136,23 +170,29 @@ function Liquidity() {
     const permissionA = client.extractPermitPermission(permitA);
     const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
     const permissionB = client.extractPermitPermission(permitB);
-    const EncryptedAmountA = await client.encrypt_uint32(
-      Number(amountA) * 10 ** 3
-    ); // TODO : to fix error handling
-    const EncryptedAmountB = await client.encrypt_uint32(
-      Number(amountB) * 10 ** 3
-    );
 
-    const permit = await client.generatePermit(pairAddress);
-    const permission = client.extractPermitPermission(permit);
-    const myBalanceEncrypted = await contract.balanceOf(
+    const EncryptedAllowanceA = await tokenAContract.allowance(
       signer.address,
-      permission
+      ROUTER,
+      permissionA
     );
-    const myBalance = client.unseal(pairAddress, myBalanceEncrypted);
-    const decimals = await contract.decimals();
+    const EncryptedAllowanceB = await tokenBContract.allowance(
+      signer.address,
+      ROUTER,
+      permissionB
+    );
 
-    console.log(Number(myBalance) / 10 ** Number(decimals));
+    const allowanceA = client.unseal(
+      TOKEN_CONTRACT[tokenA.name],
+      EncryptedAllowanceA
+    );
+    const allowanceB = client.unseal(
+      TOKEN_CONTRACT[tokenB.name],
+      EncryptedAllowanceB
+    );
+    console.log(Number(allowanceA));
+    console.log(Number(allowanceB));
+
   };
 
   const OnChangeTokenA = (value) => {
@@ -288,6 +328,12 @@ function Liquidity() {
         </div>
 
         {/* Add Liquidity Button */}
+        <button
+          onClick={handleAddApproval}
+          className="w-full mt-4 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white text-small font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
+        >
+          Approve Tokens
+        </button>
         <button
           onClick={handleAddLiquidity}
           className="w-full mt-4 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white text-small font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
