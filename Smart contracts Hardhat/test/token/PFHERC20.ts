@@ -157,7 +157,7 @@ describe("PFHERC20", function () {
   });
 
 
-  it("should be able to transferFrom only if allowance is sufficient", async function () {
+  it("should not  be able to transferFrom only if allowance is sufficient", async function () {
     const permission1 = await createPermissionForContract(
       hre,
       signer1,
@@ -187,9 +187,8 @@ describe("PFHERC20", function () {
 
 
     let encrypted_transferfrom = await fhenixjs.encrypt_uint32(70)
-    const encryptedTransferAmount = await PFHERC20.connect(signer2).transferFrom(signer1, signer2, encrypted_transferfrom, permission2);
+    await expect(PFHERC20.connect(signer2).transferFrom(signer1, signer2, encrypted_transferfrom, permission2)).to.be.revertedWith('ERC20: transfer amount exceeds allowance');
 
-    await encryptedTransferAmount.wait();
 
     const permission1balance = await createPermissionForContract(
       hre,

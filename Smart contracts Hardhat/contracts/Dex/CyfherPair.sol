@@ -102,7 +102,11 @@ contract CyfherPair is PFHERC20 {
             // need to check if the user has approved the token
             bool isAmountZero = FHE.decrypt(FHE.eq(amount0, FHE.asEuint32(0)));
             require(!isAmountZero, "CyfherSwap: Not enough tokens Approved");
-            liquidity = FHE.sub(amount0, MINIMUM_LIQUIDITY);
+
+            liquidity = FHE.sub(
+                CyfherSwapLibrary.Esqrt(FHE.mul(amount0, amount1)),
+                MINIMUM_LIQUIDITY
+            );
             _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
             euint32 liquidity1 = FHE.div(
