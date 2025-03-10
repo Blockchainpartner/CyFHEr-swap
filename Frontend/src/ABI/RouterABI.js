@@ -13,6 +13,42 @@ export const ROUTER_CONTRACT_ABI = [
   {
     inputs: [
       {
+        components: [
+          {
+            internalType: "bytes",
+            name: "data",
+            type: "bytes",
+          },
+          {
+            internalType: "int32",
+            name: "securityZone",
+            type: "int32",
+          },
+        ],
+        internalType: "struct inEuint32",
+        name: "amountIn",
+        type: "tuple",
+      },
+      {
+        internalType: "address[]",
+        name: "path",
+        type: "address[]",
+      },
+    ],
+    name: "EstimategetAmountOut",
+    outputs: [
+      {
+        internalType: "uint32",
+        name: "amountOut",
+        type: "uint32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "tokenA",
         type: "address",
@@ -280,13 +316,7 @@ export const ROUTER_CONTRACT_ABI = [
       },
     ],
     name: "swapExactTokensForTokens",
-    outputs: [
-      {
-        internalType: "uint256[]",
-        name: "amounts",
-        type: "uint256[]",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
