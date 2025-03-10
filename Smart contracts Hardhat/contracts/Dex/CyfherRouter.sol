@@ -70,8 +70,8 @@ contract CyfherRouter {
             );
             amountA = FHE.select(
                 amountAOptimalLteAmountADesired,
-                amountADesired,
-                amountAOptimal
+                amountAOptimal,
+                amountADesired
             );
             amountB = FHE.select(
                 amountBOptimalLteAmountBDesired,
