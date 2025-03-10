@@ -140,9 +140,7 @@ library CyfherSwapLibrary {
         amountIn = FHE.add(FHE.div(numerator, denominator), FHE.asEuint32(1));
     }
 
-    function binarySearchEncryptedSquareRoot(
-        euint32 x
-    ) internal pure returns (euint32) {
+    function Esqrt(euint32 x) internal pure returns (euint32) {
         ebool isZeroValue = FHE.eq(x, FHE.asEuint32(0));
         euint32 x_safe = FHE.select(isZeroValue, FHE.asEuint32(1), x);
 
