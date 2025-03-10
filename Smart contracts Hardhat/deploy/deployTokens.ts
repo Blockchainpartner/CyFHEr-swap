@@ -37,14 +37,14 @@ const deployTokens: DeployFunction = async function (
    const pEUR = await deploy("PFHERC20", {
     from: deployer,
     // Contract constructor arguments
-    args: ["PrivateEUR", "pEUR", 3],
+    args: ["PrivateEUR", "pEUR", 2],
     log: true,
     autoMine: true,
   });
   console.log("pEUR deployed with address : ", pEUR.address)
   const pUSD = await deploy("PFHERC20", {
     from: deployer,
-    args: ["PrivateUSD", "pUSD", 3],
+    args: ["PrivateUSD", "pUSD", 2],
     log: true,
     autoMine: true,
   });
@@ -52,7 +52,7 @@ const deployTokens: DeployFunction = async function (
 
   const pGPB = await deploy("PFHERC20", {
     from: deployer,
-    args: ["PrivateGPB", "pGBP", 3],
+    args: ["PrivateGPB", "pGBP", 2],
     log: true,
     autoMine: true,
   });
