@@ -34,7 +34,7 @@ const deployTokens: DeployFunction = async function (
     }
   }
 
-   const pEUR = await deploy("PFHERC20", {
+    const pEUR = await deploy("PFHERC20", {
     from: deployer,
     // Contract constructor arguments
     args: ["PrivateEUR", "pEUR", 2],
@@ -52,11 +52,11 @@ const deployTokens: DeployFunction = async function (
 
   const pGPB = await deploy("PFHERC20", {
     from: deployer,
-    args: ["PrivateGPB", "pGBP", 2],
+    args: ["PrivateGBP", "pGBP", 2],
     log: true,
     autoMine: true,
   });
-  console.log("pGBP deployed with address : ", pGPB.address)
+  console.log("pGBP deployed with address : ", pGPB.address) 
   const Distributer = await deploy("TokenDistributor", {
     from: deployer,
     args: [],
