@@ -41,7 +41,7 @@ contract CyfherRouter {
             tokenB
         );
         (amountA, amountB) = (amountADesired, amountBDesired);
-        /*  ebool reserveAEq0 = FHE.eq(reserveA, FHE.asEuint32(0));
+        ebool reserveAEq0 = FHE.eq(reserveA, FHE.asEuint32(0));
         ebool reserveBEq0 = FHE.eq(reserveB, FHE.asEuint32(0));
         // TO CHECK IF THIS CHANGE FROM "AND" OPERATOR TO "OR" OPERATOR INTRODUCES BREAKING CHANGES. Especially if first
         // liquidity provisioning is single sided
@@ -60,12 +60,16 @@ contract CyfherRouter {
                 reserveB,
                 reserveA
             );
+            ebool amountAOptimalLteAmountADesired = FHE.lte(
+                amountAOptimal,
+                amountADesired
+            );
             ebool amountBOptimalLteAmountBDesired = FHE.lte(
                 amountBOptimal,
                 amountBDesired
             );
             amountA = FHE.select(
-                amountBOptimalLteAmountBDesired,
+                amountAOptimalLteAmountADesired,
                 amountADesired,
                 amountAOptimal
             );
@@ -74,10 +78,11 @@ contract CyfherRouter {
                 amountBOptimal,
                 amountBDesired
             );
-        } */
+        }
     }
 
     function addLiquidity(
+        uint256 callnumber,
         address tokenA,
         address tokenB,
         inEuint32 calldata encryptedAmountADesired,
@@ -92,9 +97,13 @@ contract CyfherRouter {
         if (ICyfherFactory(factory).getPair(tokenA, tokenB) == address(0)) {
             ICyfherFactory(factory).createPair(tokenA, tokenB);
         }
-        (amountA, amountB) = (amountADesired, amountBDesired);
 
-        //_addLiquidity(tokenA, tokenB, amountADesired, amountBDesired);
+        (amountA, amountB) = _addLiquidity(
+            tokenA,
+            tokenB,
+            amountADesired,
+            amountBDesired
+        );
         address pair = CyfherSwapLibrary.pairFor(factory, tokenA, tokenB);
         IPFHERC20(tokenA).unsafe_transferFrom(
             msg.sender,
@@ -108,8 +117,7 @@ contract CyfherRouter {
             amountB,
             permissionB
         );
-
-        //   return pair;
+        //return pair;
         liquidity = ICyfherPair(pair).mint(to);
     }
 
@@ -199,10 +207,9 @@ contract CyfherRouter {
         Permission memory permissionB,
         address[] calldata path,
         address to
-    ) external virtual returns (uint256[] memory amounts) {
+    ) external virtual {
         euint32 amountIn = FHE.asEuint32(amountInInput);
         euint32 amountOutMin = FHE.asEuint32(amountOutMinInput);
-        //TRES IMPORTANT C'EST CA QUI CALCULE LE MONTANT DU TRADE
         euint32 amountOutput = CyfherSwapLibrary.getAmountOut(
             factory,
             amountIn,
@@ -210,7 +217,6 @@ contract CyfherRouter {
         );
 
         FHE.req(FHE.gte(amountOutput, amountOutMin));
-        //require(amounts[amounts.length - 1] >= amountOutMin, "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
         IPFHERC20(path[0]).unsafe_transferFrom(
             msg.sender,
             CyfherSwapLibrary.pairFor(factory, path[0], path[1]),
@@ -225,5 +231,20 @@ contract CyfherRouter {
             permissionB
         );
         _swap(amountOutput, path, to);
+    }
+    //this function reveals the amount of the output token and compromise
+    function EstimategetAmountOut(
+        inEuint32 calldata amountIn,
+        address[] memory path
+    ) external view returns (uint32 amountOut) {
+        // maybe add timelock or noise for output amount
+
+        amountOut = FHE.decrypt(
+            CyfherSwapLibrary.getAmountOut(
+                factory,
+                FHE.asEuint32(amountIn),
+                path
+            )
+        );
     }
 }

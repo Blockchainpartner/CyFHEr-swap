@@ -101,7 +101,6 @@ describe("CyfherAMM", function () {
       signer1,
       token2Address,
     );
-    let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(10);
 
     let encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
     let encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
@@ -121,7 +120,9 @@ describe("CyfherAMM", function () {
       token2Address,
     );
 // first addition of liquidity
-    const tx5 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
+let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(20);
+
+    const tx5 = await router.connect(signer1).addLiquidity(1,token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
     await tx5.wait();
     const pairAddress = await factory.connect(signer1).getPair(token1Address, token2Address);
     const pair = await ethers.getContractAt("CyfherPair", pairAddress, signer1);
@@ -132,23 +133,23 @@ describe("CyfherAMM", function () {
     );
     let ecryptedLpBalance = await pair.connect(signer1).balanceOf(signer1, permissionPair);
     let lpBalance =  fhenixjs.unseal(pairAddress, ecryptedLpBalance, signer1.address);
-    expect(lpBalance).to.equal(9);
+    expect(lpBalance).to.equal(19);
 
     encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
     encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
 
     balanceA =  fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
     balanceB =  fhenixjs.unseal(token2Address, encrypted_balanceB, signer1.address);
-    expect(balanceA).to.equal(90);
-    expect(balanceB).to.equal(90);
+    expect(balanceA).to.equal(80);
+    expect(balanceB).to.equal(80);
 
     // second addition of liquidity and punish liquidity provider 
     let encrypted_liquidity2 = await fhenixjs.encrypt_uint32(5)
-    const tx6 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB, signer1);
+    const tx6 = await router.connect(signer1).addLiquidity(2,token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB, signer1);
     await tx6.wait();
     ecryptedLpBalance = await pair.connect(signer1).balanceOf(signer1, permissionPair);
     lpBalance =  fhenixjs.unseal(pairAddress, ecryptedLpBalance, signer1.address);
-    expect(lpBalance).to.equal(14);
+    expect(lpBalance).to.equal(24);
     encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
     encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
     balanceA =  fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
@@ -158,7 +159,107 @@ describe("CyfherAMM", function () {
 
   it("swap tokens", async function () {
 
+    const  encrypted_mint = await fhenixjs.encrypt_uint32(50)
 
+    // make allowance for the router 
+    const permission1 = await createPermissionForContract(
+      hre,
+      signer1,
+      token1Address,
+    );
+    const permission2 = await createPermissionForContract(
+      hre,
+      signer1,
+      token2Address,
+    );
+    const tx3 = await token1.connect(signer1).approve(routerAddress, encrypted_mint, permission1);
+    await tx3.wait();
+    const tx4 = await token2.connect(signer1).approve(routerAddress, encrypted_mint, permission2);
+    await tx4.wait();
+    // add liquidity 
+    let permissionA = await createPermissionForContract(
+      hre,
+      signer1,
+      token1Address,
+    );
+    let permissionB = await createPermissionForContract(
+      hre,
+      signer1,
+      token2Address,
+    );
+    let encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
+    let encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
+    let balanceA =  fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
+    let balanceB =  fhenixjs.unseal(token2Address, encrypted_balanceB, signer1.address);
+    expect(balanceA).to.equal(100);
+    expect(balanceB).to.equal(100);
+
+    permissionA = await createPermissionForContract(
+      hre,
+      signer1,
+      token1Address,
+    );
+    permissionB = await createPermissionForContract(
+      hre,
+      signer1,
+      token2Address,
+    );
+// first addition of liquidity
+    let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(30);
+
+    const tx5 = await router.connect(signer1).addLiquidity(3,token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
+    await tx5.wait();
+    const pairAddress = await factory.connect(signer1).getPair(token1Address, token2Address);
+    const pair = await ethers.getContractAt("CyfherPair", pairAddress, signer1);
+    const permissionPair = await createPermissionForContract(
+      hre,
+      signer1,
+      pairAddress,
+    );
+    let ecryptedLpBalance = await pair.connect(signer1).balanceOf(signer1, permissionPair);
+    let lpBalance =  fhenixjs.unseal(pairAddress, ecryptedLpBalance, signer1.address);
+    expect(lpBalance).to.equal(29);
+
+    encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
+    encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
+
+    balanceA =  fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
+    balanceB =  fhenixjs.unseal(token2Address, encrypted_balanceB, signer1.address);
+    expect(balanceA).to.equal(70);
+    expect(balanceB).to.equal(70);
+    const  encrypted_swap_approval = await fhenixjs.encrypt_uint32(50)
+
+    // make allowance for the router 
+    const permissionswap1 = await createPermissionForContract(
+      hre,
+      signer1,
+      token1Address,
+    );
+    const permissionswap2 = await createPermissionForContract(
+      hre,
+      signer1,
+      token2Address,
+    );
+    const tx6 = await token1.connect(signer1).approve(routerAddress, encrypted_swap_approval, permissionswap1);
+    await tx6.wait();
+    const tx7 = await token2.connect(signer1).approve(routerAddress, encrypted_swap_approval, permissionswap2);
+    await tx7.wait();
+    const swap =30
+    let encrypted_swap_in = await fhenixjs.encrypt_uint32(swap);
+    
+    let encrypted_swap_out_min = await router.connect(signer1).EstimategetAmountOut(encrypted_swap_in, [token1Address, token2Address]);
+    console.log(encrypted_swap_out_min);
+     let encrypted_swap_out_min_enctrypted = await fhenixjs.encrypt_uint32(Number(encrypted_swap_out_min));
+    const tx8 = await router.connect(signer1).swapExactTokensForTokens(encrypted_swap_in,encrypted_swap_out_min_enctrypted,permissionswap1, permissionswap2,[token1Address, token2Address], signer1);
+    await tx8.wait();
+
+    encrypted_balanceA = await token1.connect(signer1).balanceOf(signer1, permissionA);
+    encrypted_balanceB = await token2.connect(signer1).balanceOf(signer1, permissionB);
+
+    balanceA =  fhenixjs.unseal(token1Address, encrypted_balanceA, signer1.address);
+    balanceB =  fhenixjs.unseal(token2Address, encrypted_balanceB, signer1.address);
+    expect(balanceA).to.equal(40);
+    expect(balanceB).to.equal(84); 
   });
 
   it("Remove Liquidity ", async function () {

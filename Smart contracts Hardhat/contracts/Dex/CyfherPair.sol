@@ -26,7 +26,6 @@ contract CyfherPair is PFHERC20 {
     euint32 private reserve0 = FHE.asEuint32(0); // uses single storage slot, accessible via getReserves
     euint32 private reserve1 = FHE.asEuint32(0); // uses single storage slot, accessible via getReserves
     uint32 private blockTimestampLast; // uses single storage slot, accessible via getReserves
-
     //euint32 public price0CumulativeLast;
     // euint32 public price1CumulativeLast;
     // euint32 public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
@@ -40,7 +39,7 @@ contract CyfherPair is PFHERC20 {
         unlocked = 1;
     }
 
-    constructor() PFHERC20("CyfherERC20", "Cyf", 3) {
+    constructor() PFHERC20("CyfherERC20", "Cyf", 2) {
         factory = msg.sender;
     }
 
@@ -83,30 +82,39 @@ contract CyfherPair is PFHERC20 {
         // make a get balance unsafe function until i implement eip 1272
         euint32 balance0 = IPFHERC20(token0).unsafeBalanceOf(address(this));
         euint32 balance1 = IPFHERC20(token1).unsafeBalanceOf(address(this));
+
         euint32 amount0 = FHE.sub(balance0, _reserve0);
         euint32 amount1 = FHE.sub(balance1, _reserve1);
-        euint32 totalSupply = _totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
+
+        //bool feeOn = _mintFee(_reserve0, _reserve1);
+        // euint32 totalSupply = _totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
         ebool totalSupplyIsZeroEncrypted = FHE.eq(
-            totalSupply,
+            _totalSupply,
             FHE.asEuint32(0)
         );
 
         // decrypting if totalsupply is 0 or not  does not reveal any sensetive information ,doing if else statement will save gas
         bool totalSupplyIsZero = FHE.decrypt(totalSupplyIsZeroEncrypted);
         if (totalSupplyIsZero) {
-            _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
             // we should use square root here
             // Edge case if amount 0 and amount 1 are 0 when adding liquidity this will revert or underflow
             // we assume that the user will add same amount of token0 and token1
-            liquidity = amount0 - MINIMUM_LIQUIDITY;
-            Console.log(FHE.decrypt(liquidity));
+            // TODO : to add sqrt later to see if it will work
+            liquidity = FHE.sub(amount0, MINIMUM_LIQUIDITY);
+            _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
-            liquidity = FHE.min(
-                (amount0 * _totalSupply) / _reserve0,
-                (amount1 * _totalSupply) / _reserve1
+            euint32 liquidity1 = FHE.div(
+                FHE.mul(amount0, _totalSupply),
+                _reserve0
             );
+            euint32 liquidity2 = FHE.div(
+                FHE.mul(amount1, _totalSupply),
+                _reserve1
+            );
+            liquidity = FHE.min(liquidity1, liquidity2);
         }
-        // FHE.req(liquidity.gt(FHE.asEuint32(0)));
+        FHE.req(FHE.gt(liquidity, FHE.asEuint32(0)));
+
         _mint(to, liquidity);
         _update(balance0, balance1, _reserve0, _reserve1);
     }
@@ -136,7 +144,6 @@ contract CyfherPair is PFHERC20 {
         IPFHERC20(address(_token1))._transfer(amount1, to);
         balance0 = IPFHERC20(_token0).unsafeBalanceOf(address(this));
         balance1 = IPFHERC20(_token1).unsafeBalanceOf(address(this));
-
         _update(balance0, balance1, _reserve0, _reserve1);
         // if (feeOn) kLast = uint256(reserve0) * reserve1; // reserve0 and reserve1 are up-to-date
         // emit Burn(msg.sender, amount0, amount1, to);
@@ -181,15 +188,11 @@ contract CyfherPair is PFHERC20 {
             FHE.sub(balance0, FHE.sub(_reserve0, amount0Out)),
             FHE.asEuint32(0)
         );
-        Console.log("Amount0In : %s", FHE.decrypt(amount0In));
         euint32 amount1In = FHE.select(
             balance1GtReserve1MinusAmount1Out,
             FHE.sub(balance1, FHE.sub(_reserve1, amount1Out)),
             FHE.asEuint32(0)
         );
-        Console.log("Amount1In : %s", FHE.decrypt(amount1In));
-        Console.log("reserve0 : %s", FHE.decrypt(_reserve0));
-        Console.log("reserve1 : %s", FHE.decrypt(_reserve1));
 
         // uint256 amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
         // uint256 amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
@@ -204,19 +207,6 @@ contract CyfherPair is PFHERC20 {
                 FHE.mul(balance1, FHE.asEuint32(1000)),
                 FHE.mul(amount1In, FHE.asEuint32(3))
             );
-            Console.log("balance0adj : %s", FHE.decrypt(balance0Adjusted));
-            Console.log("balance1adj : %s", FHE.decrypt(balance1Adjusted));
-
-            Console.log(
-                "new K: %s",
-                FHE.decrypt(FHE.mul(balance0Adjusted, balance1Adjusted))
-            );
-            Console.log(
-                "old K: %s",
-                FHE.decrypt(
-                    FHE.mul(FHE.mul(_reserve0, _reserve1), FHE.asEuint32(1e6))
-                )
-            );
             // Here we check newK > oldK
             // BE CAREFUL, WE SHOULD REMOVE THIS CHECK AS IT MAY OVERFLOW VERY EASILY
             FHE.req(
@@ -229,9 +219,5 @@ contract CyfherPair is PFHERC20 {
         }
 
         _update(balance0, balance1, _reserve0, _reserve1);
-        // emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
     }
-
-    // if (feeOn) kLast = uint256(reserve0) * reserve1; // reserve0 and reserve1 are up-to-date
-    // emit Mint(msg.sender, amount0, amount1);
 }

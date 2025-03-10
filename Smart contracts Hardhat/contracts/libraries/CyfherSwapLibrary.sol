@@ -81,6 +81,7 @@ library CyfherSwapLibrary {
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
+
     function getAmountOut(
         address factory,
         euint32 amountIn,
@@ -101,10 +102,6 @@ library CyfherSwapLibrary {
                 FHE.gt(reserveOut, FHE.asEuint32(0))
             )
         );
-
-        // console.log("reserve in : %s", FHE.decrypt(reserveIn));
-        // console.log("reserve out : %s", FHE.decrypt(reserveOut));
-
         euint32 amountInWithFee = FHE.mul(amountIn, FHE.asEuint32(997));
         euint32 numerator = FHE.mul(amountInWithFee, reserveOut);
         euint32 denominator = FHE.add(
