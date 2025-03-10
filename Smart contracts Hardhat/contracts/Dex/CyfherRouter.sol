@@ -82,7 +82,6 @@ contract CyfherRouter {
     }
 
     function addLiquidity(
-        uint256 callnumber,
         address tokenA,
         address tokenB,
         inEuint32 calldata encryptedAmountADesired,

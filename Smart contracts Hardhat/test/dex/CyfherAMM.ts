@@ -122,7 +122,7 @@ describe("CyfherAMM", function () {
 // first addition of liquidity
 let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(20);
 
-    const tx5 = await router.connect(signer1).addLiquidity(1,token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
+    const tx5 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
     await tx5.wait();
     const pairAddress = await factory.connect(signer1).getPair(token1Address, token2Address);
     const pair = await ethers.getContractAt("CyfherPair", pairAddress, signer1);
@@ -145,7 +145,7 @@ let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(20);
 
     // second addition of liquidity and punish liquidity provider 
     let encrypted_liquidity2 = await fhenixjs.encrypt_uint32(5)
-    const tx6 = await router.connect(signer1).addLiquidity(2,token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB, signer1);
+    const tx6 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity2, permissionA, permissionB, signer1);
     await tx6.wait();
     ecryptedLpBalance = await pair.connect(signer1).balanceOf(signer1, permissionPair);
     lpBalance =  fhenixjs.unseal(pairAddress, ecryptedLpBalance, signer1.address);
@@ -207,7 +207,7 @@ let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(20);
 // first addition of liquidity
     let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(30);
 
-    const tx5 = await router.connect(signer1).addLiquidity(3,token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
+    const tx5 = await router.connect(signer1).addLiquidity(token1Address, token2Address, encrypted_liquidity1, encrypted_liquidity1, permissionA, permissionB, signer1);
     await tx5.wait();
     const pairAddress = await factory.connect(signer1).getPair(token1Address, token2Address);
     const pair = await ethers.getContractAt("CyfherPair", pairAddress, signer1);
@@ -248,8 +248,7 @@ let encrypted_liquidity1 = await fhenixjs.encrypt_uint32(20);
     let encrypted_swap_in = await fhenixjs.encrypt_uint32(swap);
     
     let encrypted_swap_out_min = await router.connect(signer1).EstimategetAmountOut(encrypted_swap_in, [token1Address, token2Address]);
-    console.log(encrypted_swap_out_min);
-     let encrypted_swap_out_min_enctrypted = await fhenixjs.encrypt_uint32(Number(encrypted_swap_out_min));
+    let encrypted_swap_out_min_enctrypted = await fhenixjs.encrypt_uint32(Number(encrypted_swap_out_min));
     const tx8 = await router.connect(signer1).swapExactTokensForTokens(encrypted_swap_in,encrypted_swap_out_min_enctrypted,permissionswap1, permissionswap2,[token1Address, token2Address], signer1);
     await tx8.wait();
 
