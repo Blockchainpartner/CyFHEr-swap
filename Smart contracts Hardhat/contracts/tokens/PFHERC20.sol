@@ -242,7 +242,6 @@ contract PFHERC20 is Ownable2Step, Permissioned {
         onlyBetweenPermitted(permission, from, msg.sender)
         returns (euint32)
     {
-        Console.log("toTransfer", FHE.decrypt(toTransfer));
         euint32 spent = _spendAllowance(from, msg.sender, toTransfer);
         return _transferImpl(from, to, spent);
     }
