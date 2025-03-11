@@ -1,4 +1,20 @@
-import React, { useState } from "react";
+import React, {
+  useState, useEffect
+} from "react";
+import clsx from "clsx";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { FhenixClient } from "fhenixjs";
+import { FACTORY, ROUTER, TOKEN_CONTRACT } from "../constants/contracts";
+import { ROUTER_CONTRACT_ABI } from "../ABI/RouterABI";
+import { FACTORY_CONTRACT_ABI } from "../ABI/FactoryABI";
+import { ERC_CONTRACT_ABI } from "../ABI/FHERC20ABI";
+
+import { ethers } from "ethers";
+import toast from "react-hot-toast";
+
+import privateEuroLogo from "../assets/private euro.png";
+import privateUsdLogo from "../assets/private usd.png";
+import privateGbpLogo from "../assets/private gbp.png";
 
 function Swap() {
   const [sellValue, setSellValue] = useState("");
@@ -7,21 +23,133 @@ function Swap() {
   const [selectedBuyToken, setSelectedBuyToken] = useState("pUSD");
   const [isSellDropdownOpen, setSellDropdownOpen] = useState(false);
   const [isBuyDropdownOpen, setBuyDropdownOpen] = useState(false);
-
+  const decimals = 2;
   // Available tokens for swapping
   const tokens = ["pEUR", "pGPD", "pUSD"];
-
   // Handle swapping Sell and Buy values
   const handleSwap = () => {
     const tempValue = sellValue;
     const tempToken = selectedSellToken;
-
     setSellValue(buyValue);
     setSelectedSellToken(selectedBuyToken);
-
     setBuyValue(tempValue);
     setSelectedBuyToken(tempToken);
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const client = new FhenixClient({ provider });
+
+        const routerContract = new ethers.Contract(
+          ROUTER,
+          ROUTER_CONTRACT_ABI,
+          signer
+        );
+
+        const EncryptedAmountA = await client.encrypt_uint32(
+          Number(sellValue) * 10 ** decimals
+        );
+
+        const amount = await routerContract.EstimategetAmountOut(EncryptedAmountA, [
+          TOKEN_CONTRACT[selectedSellToken],
+          TOKEN_CONTRACT[selectedBuyToken],
+        ]);
+
+        setBuyValue(amount / 10 ** decimals);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [sellValue]);
+
+  const handleSwapApproval = async () => {
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const client = new FhenixClient({ provider });
+    const permitA = await client.generatePermit(TOKEN_CONTRACT[selectedSellToken]);
+    const permissionA = client.extractPermitPermission(permitA);
+    const encsellValue = await client.encrypt_uint32(
+      Number(sellValue) * 10 ** decimals
+    );
+    try {
+      await toast.promise(
+        (async () => {
+
+          const tokenAContract = new ethers.Contract(
+            TOKEN_CONTRACT[selectedSellToken],
+            ERC_CONTRACT_ABI,
+            signer
+          );
+
+          const tx1 = await tokenAContract.approve(ROUTER, encsellValue, permissionA);
+          await tx1.wait();
+
+        })(),
+        {
+          loading: "Excuting transactions",
+          success: "Approval successful! ",
+          error: "An error occurred while approving 😢",
+        }
+      );
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+
+
+
+
+  const handleSwapTx = async () => {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const client = new FhenixClient({ provider });
+      const permitA = await client.generatePermit(TOKEN_CONTRACT[selectedSellToken]);
+      const permissionA = client.extractPermitPermission(permitA);
+      const permitB = await client.generatePermit(TOKEN_CONTRACT[selectedBuyToken]);
+      const permissionB = client.extractPermitPermission(permitB);
+      const routerContract = new ethers.Contract(
+        ROUTER,
+        ROUTER_CONTRACT_ABI,
+        signer
+      );
+
+      const EncryptedAmountA = await client.encrypt_uint32(
+        Number(sellValue) * 10 ** decimals
+      );
+      const EncryptedAmountAMin = await client.encrypt_uint32(
+        (Number(sellValue) / 10) * 10 ** decimals
+      );
+
+      const tx = await routerContract.swapExactTokensForTokens(EncryptedAmountA, EncryptedAmountAMin, permissionA, permissionB, [
+        TOKEN_CONTRACT[selectedSellToken],
+        TOKEN_CONTRACT[selectedBuyToken],
+
+      ], signer.address,);
+
+      await toast.promise(
+        (async () => {
+          await tx.wait();
+        })(),
+        {
+          loading: "Swapping tokens...",
+          success: "Swap successful! 🎉",
+          error: "An error occurred while swapping tokens 😢",
+        }
+      );
+    } catch (error) {
+      console.error("Error swapping tokens:", error);
+    }
+  }
 
   return (
     <div
@@ -166,10 +294,15 @@ function Swap() {
 
       {/* Action Button */}
       <button
-        onClick={() =>
-          alert(
-            `Swapping ${sellValue} ${selectedSellToken} for ${buyValue} ${selectedBuyToken}`
-          )
+        onClick={handleSwapApproval
+
+        }
+        className="w-full text-center text-white mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
+      >
+        Approve
+      </button>
+      <button
+        onClick={handleSwapTx
         }
         className="w-full text-center text-white mt-6 py-2 px-5 bg-gradient-to-r from-violet-500 to-violet-700 text-white font-semibold rounded-lg shadow-md hover:from-violet-400 hover:to-violet-600 transition-colors duration-200 focus:ring-2 focus:ring-violet-400"
       >
