@@ -1,5 +1,7 @@
 # CyFHEr-swap
 
+> A **confidential Automated Market Maker** based on Uniswap V2, deployed on the Fhenix Nitrogen testnet, enabling fully **end-to-end encrypted swaps**.
+
 ## Project history
 
 For years, at Blockchain Partner by KPMG, we have guided clients in exploring blockchain and crypto assets related innovations. Among the key concerns consistently raised in our research and advisory work, **data confidentiality** has always been on the tops, especially for **financial institutions** and **corporate** clients.
