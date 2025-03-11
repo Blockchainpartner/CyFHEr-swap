@@ -121,7 +121,6 @@ contract PFHERC20 is Ownable2Step, Permissioned {
         if (spender == address(0)) {
             revert ERC20InvalidSpender(address(0));
         }
-
         _allowance[owner][spender] = value;
     }
 
@@ -132,14 +131,20 @@ contract PFHERC20 is Ownable2Step, Permissioned {
     ) internal virtual returns (euint32) {
         euint32 currentAllowance = _allowance[owner][spender];
         ebool isHigher = FHE.gte(currentAllowance, value);
+        // FHEVM BUG , operation executed twice once wiht uint32.max/2 and then with the input value
+        /*         Console.log("isHigher", FHE.decrypt(isHigher));
         require(
             FHE.decrypt(isHigher),
             "ERC20: transfer amount exceeds allowance"
+        ); */
+        euint32 spent = FHE.select(
+            isHigher,
+            currentAllowance,
+            FHE.asEuint32(0)
         );
-        _allowance[owner][spender] = FHE.sub(currentAllowance, value);
-        _approve(owner, spender, (currentAllowance - value));
+        _approve(owner, spender, (currentAllowance - spent));
 
-        return value;
+        return spent;
     }
 
     function transferFrom(
@@ -237,7 +242,7 @@ contract PFHERC20 is Ownable2Step, Permissioned {
         onlyBetweenPermitted(permission, from, msg.sender)
         returns (euint32)
     {
-        // euint32 toTransfer = FHE.asEuint32(value);
+        Console.log("toTransfer", FHE.decrypt(toTransfer));
         euint32 spent = _spendAllowance(from, msg.sender, toTransfer);
         return _transferImpl(from, to, spent);
     }
