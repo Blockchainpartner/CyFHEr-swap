@@ -22,20 +22,7 @@ interface ICyfherPair {
         address to,
         uint value
     ) external returns (bool);
-
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
-    function PERMIT_TYPEHASH() external pure returns (bytes32);
     function nonces(address owner) external view returns (uint);
-
-    function permit(
-        address owner,
-        address spender,
-        uint value,
-        uint deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
 
     function MINIMUM_LIQUIDITY() external view returns (euint32);
 
@@ -50,19 +37,10 @@ interface ICyfherPair {
         view
         returns (euint32 reserve0, euint32 reserve1, uint32 blockTimestampLast);
 
-    //function price0CumulativeLast() external view returns (uint);
-
-    //function price1CumulativeLast() external view returns (uint);
-
-    //function kLast() external view returns (uint);
     function burn(
         address to
     ) external returns (euint32 amount0, euint32 amount1);
     function mint(address to) external returns (euint32 liquidity);
     function swap(euint32 amount0Out, euint32 amount1Out, address to) external;
-
-    // function skim(address to) external;
-    // function sync() external;
-
     function initialize(address, address) external;
 }

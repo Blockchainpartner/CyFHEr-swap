@@ -131,8 +131,10 @@ contract PFHERC20 is Ownable2Step, Permissioned {
     ) internal virtual returns (euint32) {
         euint32 currentAllowance = _allowance[owner][spender];
         ebool isHigher = FHE.gte(currentAllowance, value);
-        // FHEVM BUG , operation executed twice once wiht uint32.max/2 and then with the input value
-        /*         Console.log("isHigher", FHE.decrypt(isHigher));
+        // FHEVM BUG :while Console.log the operation executed twice once with uint32.max/2 and then with the input value
+        // this commented code below reverts the transaction
+
+        /*Console.log("isHigher", FHE.decrypt(isHigher));
         require(
             FHE.decrypt(isHigher),
             "ERC20: transfer amount exceeds allowance"

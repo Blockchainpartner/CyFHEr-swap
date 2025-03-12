@@ -73,7 +73,7 @@ describe("TokenDistributor", function () {
 
     const transfer = await PFHERC20.connect(signer).transferOwnership(TokenDistributorAddress);
     await transfer.wait();
-     const accept = await TokenDistributor.connect(signer).acceptOwnership(PFHERC20Address);
+    const accept = await TokenDistributor.connect(signer).acceptOwnership(PFHERC20Address);
     await accept.wait();
 
     const claim = await TokenDistributor.connect(signer).claim(PFHERC20Address);

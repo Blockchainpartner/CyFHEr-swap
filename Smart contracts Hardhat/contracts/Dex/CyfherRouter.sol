@@ -3,7 +3,6 @@
 pragma solidity ^0.8.24;
 
 import {ICyfherFactory} from "../interfaces/ICyfherFactory.sol";
-import {ICyfherRouter} from "../interfaces/ICyfherRouter.sol";
 import {ICyfherPair} from "../interfaces/ICyfherPair.sol";
 import {CyfherSwapLibrary} from "../libraries/CyfherSwapLibrary.sol";
 import {IPFHERC20} from "../interfaces/IPFHERC20.sol";
@@ -12,7 +11,6 @@ import "@fhenixprotocol/contracts/FHE.sol";
 import "@fhenixprotocol/contracts/utils/debug/Console.sol";
 
 contract CyfherRouter {
-    // is ICyfherRouter {
     //solhint-disable-next-line immutable-vars-naming
     address public immutable factory;
 
@@ -126,18 +124,8 @@ contract CyfherRouter {
         address tokenB,
         inEuint32 calldata encLiquidity,
         Permission memory permissionA,
-        // euint32 amountAMin,
-        // euint32 amountBMin,
         address to /* ensure(deadline) */
-    )
-        public
-        virtual
-        returns (
-            // uint256 deadline
-            euint32 amountA,
-            euint32 amountB
-        )
-    {
+    ) public virtual returns (euint32 amountA, euint32 amountB) {
         euint32 liquidity = FHE.asEuint32(encLiquidity);
         address pair = CyfherSwapLibrary.pairFor(factory, tokenA, tokenB);
 
@@ -153,8 +141,6 @@ contract CyfherRouter {
         (amountA, amountB) = tokenA == token0
             ? (amount0, amount1)
             : (amount1, amount0);
-        // require(amountA >= amountAMin, "UniswapV2Router: INSUFFICIENT_A_AMOUNT");
-        // require(amountB >= amountBMin, "UniswapV2Router: INSUFFICIENT_B_AMOUNT");
     }
 
     // **** SWAP ****
@@ -164,20 +150,8 @@ contract CyfherRouter {
         address[] memory path,
         address _to
     ) internal virtual {
-        // for (uint256 i; i < path.length - 1; i++) {
-        //     (address input, address output) = (path[i], path[i + 1]);
-        //     (address token0,) = UniswapV2Library.sortTokens(input, output);
-        //     uint256 amountOut = amounts[i + 1];
-        //     (uint256 amount0Out, uint256 amount1Out) =
-        //         input == token0 ? (uint256(0), amountOut) : (amountOut, uint256(0));
-        //     address to = i < path.length - 2 ? UniswapV2Library.pairFor(factory, output, path[i + 2]) : _to;
-        //     IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(amount0Out, amount1Out, to);
-        // }
-
         (address input, address output) = (path[0], path[1]);
         (address token0, ) = CyfherSwapLibrary.sortTokens(path[0], path[1]);
-
-        // Handle the sorting of tokens by their hexadecimal address in the pair contract
         ebool inputEqToken0 = FHE.eq(
             FHE.asEaddress(input),
             FHE.asEaddress(token0)
@@ -193,8 +167,6 @@ contract CyfherRouter {
             FHE.asEuint32(0)
         );
 
-        // (uint256 amount0Out, uint256 amount1Out) = input == token0 ? (uint256(0), amountOut) : (amountOut,
-        // uint256(0));
         address pair = CyfherSwapLibrary.pairFor(factory, input, output);
         ICyfherPair(pair).swap(amount0Out, amount1Out, _to);
     }
@@ -231,19 +203,20 @@ contract CyfherRouter {
         );
         _swap(amountOutput, path, to);
     }
-    //this function reveals the amount of the output token and compromise
+    //this function reveals the amount of the output token and compromises  privacy of
     function EstimategetAmountOut(
         inEuint32 calldata amountIn,
         address[] memory path
     ) external view returns (uint32 amountOut) {
-        // maybe add timelock or noise for output amount
+        euint32 input = FHE.asEuint32(amountIn);
 
+        bool isZero = FHE.decrypt(FHE.eq(FHE.asEuint32(0), input));
+        if (isZero) {
+            return 0;
+        }
+        // maybe add timelock or noise for output amount
         amountOut = FHE.decrypt(
-            CyfherSwapLibrary.getAmountOut(
-                factory,
-                FHE.asEuint32(amountIn),
-                path
-            )
+            CyfherSwapLibrary.getAmountOut(factory, input, path)
         );
     }
 }

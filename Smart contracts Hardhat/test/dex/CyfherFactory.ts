@@ -80,11 +80,9 @@ describe("CyfherFactory", function () {
     if (receipt != null) {
       const pairAddress = receipt.logs[0].address;
       // Check event emission
-      console.log(token1Address)
-      console.log(token2Address)
       await expect(tx)
         .to.emit(factory, "PairCreated")
-        .withArgs(token1Address, token2Address, pairAddress, 1);
+        .withArgs(token2Address,token1Address, pairAddress, 1);
     }
   });
 

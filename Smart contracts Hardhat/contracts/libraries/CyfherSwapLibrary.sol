@@ -46,7 +46,7 @@ library CyfherSwapLibrary {
         pair = ICyfherFactory(factory).getPair(tokenA, tokenB);
     }
 
-    // // fetches and sorts the reserves for a pair
+    // fetches and sorts the reserves for a pair
     function getReserves(
         address factory,
         address tokenA,
@@ -71,23 +71,18 @@ library CyfherSwapLibrary {
         euint32 reserveA,
         euint32 reserveB
     ) internal pure returns (euint32 amountB) {
-        // require(amountA > 0, "UniswapV2Library: INSUFFICIENT_AMOUNT");
         FHE.req(FHE.gt(amountA, FHE.asEuint32(0)));
-
-        // require(reserveA > 0 && reserveB > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
         FHE.req(FHE.gt(reserveA, FHE.asEuint32(0)));
         FHE.req(FHE.gt(reserveB, FHE.asEuint32(0)));
         amountB = FHE.div(FHE.mul(amountA, reserveB), reserveA);
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
-
     function getAmountOut(
         address factory,
         euint32 amountIn,
         address[] memory path
     ) internal view returns (euint32 amountOut) {
-        // require(amountIn > 0, "UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT");
         FHE.req(FHE.gt(amountIn, FHE.asEuint32(0)));
         // Imported from getAmountsOut function
         (euint32 reserveIn, euint32 reserveOut) = getReserves(
@@ -95,7 +90,6 @@ library CyfherSwapLibrary {
             path[0],
             path[1]
         );
-        // require(reserveIn > 0 && reserveOut > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
         FHE.req(
             FHE.and(
                 FHE.gt(reserveIn, FHE.asEuint32(0)),
@@ -117,10 +111,7 @@ library CyfherSwapLibrary {
         euint32 reserveIn,
         euint32 reserveOut
     ) internal pure returns (euint32 amountIn) {
-        //require(amountOut > 0, "UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT");
         FHE.req(FHE.gt(amountOut, FHE.asEuint32(0)));
-
-        //require(reserveIn > 0 && reserveOut > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
         FHE.req(
             FHE.and(
                 FHE.gt(reserveIn, FHE.asEuint32(0)),
@@ -136,7 +127,7 @@ library CyfherSwapLibrary {
         euint32 denominator = FHE.mul(
             FHE.sub(reserveOut, amountOut),
             FHE.asEuint32(997)
-        ); //(reserveOut - amountOut) * 997;
+        );
         amountIn = FHE.add(FHE.div(numerator, denominator), FHE.asEuint32(1));
     }
 
@@ -175,7 +166,7 @@ library CyfherSwapLibrary {
         return r;
     }
 
-    /// @dev Be careful: Multipath token won't be calculated because of for loop that can easily run out of gas
+    /// @dev will not be implemented: Multipath token won't be calculated because of for loop that can easily run out of gas
     // // performs chained getAmountOut calculations on any number of pairs
     // function getAmountsOut(
     //     address factory,

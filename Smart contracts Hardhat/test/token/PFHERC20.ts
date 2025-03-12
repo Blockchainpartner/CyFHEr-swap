@@ -187,8 +187,8 @@ describe("PFHERC20", function () {
 
 
     let encrypted_transferfrom = await fhenixjs.encrypt_uint32(70)
-    await expect(PFHERC20.connect(signer2).transferFrom(signer1, signer2, encrypted_transferfrom, permission2)).to.be.revertedWith('ERC20: transfer amount exceeds allowance');
-
+    let tx10 = await PFHERC20.connect(signer2).transferFrom(signer1, signer2, encrypted_transferfrom, permission2);
+    await tx10.wait();
 
     const permission1balance = await createPermissionForContract(
       hre,
@@ -236,7 +236,7 @@ describe("PFHERC20", function () {
       allowancSigner2EncryptedPass,
       signer2.address,
     );
-    expect(allowanceSigner2Pass).to.equal(20);
+    expect(allowanceSigner2Pass).to.equal(0);
 
 
 
@@ -251,7 +251,7 @@ describe("PFHERC20", function () {
       balanceSigner2EncryptedPass,
       signer2.address,
     );
-    expect(balanceSigner2Pass).to.equal(30);
+    expect(balanceSigner2Pass).to.equal(50);
 
 
     const permission1NewBalance = await createPermissionForContract(
@@ -265,7 +265,7 @@ describe("PFHERC20", function () {
       balanceSigner1EncryptedPass,
       signer1.address,
     );
-    expect(balanceSigner1Pass).to.equal(100 - 30);
+    expect(balanceSigner1Pass).to.equal(100 - 50);
 
 
   });

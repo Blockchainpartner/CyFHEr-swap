@@ -2,7 +2,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 /**
- * Deploys a contract named "Counter" using the deployer account and
+ * Deploys the tokens contracts as well as the token distributer using the deployer account and
  * constructor arguments set to the deployer address
  *
  * @param hre HardhatRuntimeEnvironment object.
@@ -72,5 +72,4 @@ const deployTokens: DeployFunction = async function (
 export default deployTokens;
 
 // Tags are useful if you have multiple deploy files and only want to run one of them.
-// e.g. yarn deploy --tags Counter
 deployTokens.tags = ["Tokens"];
