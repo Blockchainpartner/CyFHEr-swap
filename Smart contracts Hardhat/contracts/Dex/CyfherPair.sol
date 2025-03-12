@@ -9,7 +9,6 @@ import {PFHERC20} from "../tokens/PFHERC20.sol";
 import {CyfherSwapLibrary} from "../libraries/CyfherSwapLibrary.sol";
 import {Permissioned, Permission} from "@fhenixprotocol/contracts/access/Permissioned.sol";
 import "@fhenixprotocol/contracts/FHE.sol";
-import "@fhenixprotocol/contracts/utils/debug/Console.sol";
 
 contract CyfherPair is PFHERC20 {
     euint32 public MINIMUM_LIQUIDITY = FHE.asEuint32(1);
@@ -128,19 +127,19 @@ contract CyfherPair is PFHERC20 {
         euint32 amount1Out,
         address to
     ) external lock {
-        (euint32 _reserve0, euint32 _reserve1, ) = getReserves(); // gas savings
+        //(euint32 _reserve0, euint32 _reserve1, ) = getReserves(); // gas savings
         euint32 balance0;
         euint32 balance1;
-        {
-            // scope for _token{0,1}, avoids stack too deep errors
-            address _token0 = token0;
-            address _token1 = token1;
-            IPFHERC20(_token0)._transfer(amount0Out, to);
-            IPFHERC20(_token1)._transfer(amount1Out, to);
-            balance0 = IPFHERC20(_token0).unsafeBalanceOf(address(this));
-            balance1 = IPFHERC20(_token1).unsafeBalanceOf(address(this));
-        }
-        ebool balance0GtReserve0MinusAmount0Out = FHE.gt(
+
+        // scope for _token{0,1}, avoids stack too deep errors
+        address _token0 = token0;
+        address _token1 = token1;
+        IPFHERC20(_token0)._transfer(amount0Out, to);
+        IPFHERC20(_token1)._transfer(amount1Out, to);
+        balance0 = IPFHERC20(_token0).unsafeBalanceOf(address(this));
+        balance1 = IPFHERC20(_token1).unsafeBalanceOf(address(this));
+        // POTENTIAL OVERFLOW RISK
+        /*         ebool balance0GtReserve0MinusAmount0Out = FHE.gt(
             balance0,
             FHE.sub(_reserve0, amount0Out)
         );
@@ -176,7 +175,7 @@ contract CyfherPair is PFHERC20 {
                     FHE.mul(FHE.mul(_reserve0, _reserve1), FHE.asEuint32(1e6))
                 )
             );
-        }
+        } */
 
         _update(balance0, balance1);
     }
