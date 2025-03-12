@@ -8,7 +8,6 @@ import {CyfherSwapLibrary} from "../libraries/CyfherSwapLibrary.sol";
 import {IPFHERC20} from "../interfaces/IPFHERC20.sol";
 import {Permissioned, Permission} from "@fhenixprotocol/contracts/access/Permissioned.sol";
 import "@fhenixprotocol/contracts/FHE.sol";
-import "@fhenixprotocol/contracts/utils/debug/Console.sol";
 
 contract CyfherRouter {
     //solhint-disable-next-line immutable-vars-naming
