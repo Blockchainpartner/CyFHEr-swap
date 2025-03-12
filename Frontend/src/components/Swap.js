@@ -49,7 +49,7 @@ function Swap() {
           TOKEN_CONTRACT[selectedBuyToken],
         ]);
 
-        setBuyValue(amount / 10 ** decimals);
+        setBuyValue(Number(amount) / 10 ** decimals);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
