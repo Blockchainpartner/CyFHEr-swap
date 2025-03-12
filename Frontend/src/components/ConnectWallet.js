@@ -6,7 +6,6 @@ function ConnectWallet({ isConnected }) {
     const storedWallet = localStorage.getItem("walletAddress");
     const connectedWallet = localStorage.getItem("connected");
 
-    console.log(storedWallet);
     return connectedWallet ? storedWallet : null;
   });
   const [error, setError] = useState(null);
@@ -35,7 +34,6 @@ function ConnectWallet({ isConnected }) {
       // Listen for account changes
       const handleAccountsChanged = (accounts) => {
         if (accounts.length === 0) {
-          console.log("Account disconnected");
           isConnected(false);
           setAccount(null); // Handle disconnection
         } else {
@@ -45,7 +43,6 @@ function ConnectWallet({ isConnected }) {
       };
       // Listen for disconnection
       const handleDisconnect = (error) => {
-        console.log("Disconnected from the wallet:", error);
         setAccount(null);
         setError(null); // Handle disconnection
         localStorage.removeItem("walletAddress");

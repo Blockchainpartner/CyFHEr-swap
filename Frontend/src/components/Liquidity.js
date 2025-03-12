@@ -60,14 +60,12 @@ function Liquidity() {
         const token0 = await PairContract.token0();
         const token1 = await PairContract.token1();
 
-        console.log(token0, token1);
         // Fetch token names
         const Token0Contract = new ethers.Contract(token0, ERC_CONTRACT_ABI, signer);
         const Token1Contract = new ethers.Contract(token1, ERC_CONTRACT_ABI, signer);
 
         const token0Name = await Token0Contract.symbol();
         const token1Name = await Token1Contract.symbol();
-        console.log(token0Name, token1Name);
         let newPair = {
           id: i,
           name1: token0Name,
@@ -104,8 +102,7 @@ function Liquidity() {
     const EncryptedAmountB = await client.encrypt_uint32(
       Number(amountB) * 10 ** decimals
     );
-    console.log(Number(amountA) * 10 ** decimals);
-    console.log(Number(amountB) * 10 ** decimals);
+
     try {
       const permitA = await client.generatePermit(TOKEN_CONTRACT[tokenA.name]);
       const permissionA = client.extractPermitPermission(permitA);
@@ -126,7 +123,6 @@ function Liquidity() {
     }
     catch (error) {
       // FHEVM Does internal RPC error but transaction passes
-      console.log(error);
       toast.success("Liquidity added successfully");
     }
   };
@@ -171,7 +167,7 @@ function Liquidity() {
       );
     }
     catch (error) {
-      console.log(error);
+      console.error(error);
     }
 
   }
@@ -208,7 +204,7 @@ function Liquidity() {
       );
     }
     catch (error) {
-      console.log(error);
+      console.error(error);
     }
 
   }
@@ -239,47 +235,6 @@ function Liquidity() {
     );
     await tx3.wait();
     toast.success("Liquidity removed successfully");
-    /*     const pair = await FactoryContract.allPairsLength();
-        console.log(pair);
-        const pairAddress = await FactoryContract.allPairs(Number(pair) - 1);
-        console.log(pairAddress); */
-    /*   const tokenAContract = new ethers.Contract(
-        TOKEN_CONTRACT[tokenA.name],
-        ERC_CONTRACT_ABI,
-        signer
-      );
-      const tokenBContract = new ethers.Contract(
-        TOKEN_CONTRACT[tokenB.name],
-        ERC_CONTRACT_ABI,
-        signer
-      );
-      const permitA = await client.generatePermit(TOKEN_CONTRACT[tokenA.name]);
-      const permissionA = client.extractPermitPermission(permitA);
-      const permitB = await client.generatePermit(TOKEN_CONTRACT[tokenB.name]);
-      const permissionB = client.extractPermitPermission(permitB);
-  
-      const EncryptedAllowanceA = await tokenAContract.allowance(
-        signer.address,
-        ROUTER,
-        permissionA
-      );
-      const EncryptedAllowanceB = await tokenBContract.allowance(
-        signer.address,
-        ROUTER,
-        permissionB
-      );
-  
-      const allowanceA = client.unseal(
-        TOKEN_CONTRACT[tokenA.name],
-        EncryptedAllowanceA
-      );
-      const allowanceB = client.unseal(
-        TOKEN_CONTRACT[tokenB.name],
-        EncryptedAllowanceB
-      );
-      console.log(Number(allowanceA));
-      console.log(Number(allowanceB)); */
-
   };
 
   const OnChangeTokenA = (value) => {

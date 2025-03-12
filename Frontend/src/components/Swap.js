@@ -1,20 +1,12 @@
 import React, {
   useState, useEffect
 } from "react";
-import clsx from "clsx";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { FhenixClient } from "fhenixjs";
-import { FACTORY, ROUTER, TOKEN_CONTRACT } from "../constants/contracts";
+import { ROUTER, TOKEN_CONTRACT } from "../constants/contracts";
 import { ROUTER_CONTRACT_ABI } from "../ABI/RouterABI";
-import { FACTORY_CONTRACT_ABI } from "../ABI/FactoryABI";
 import { ERC_CONTRACT_ABI } from "../ABI/FHERC20ABI";
-
 import { ethers } from "ethers";
 import toast from "react-hot-toast";
-
-import privateEuroLogo from "../assets/private euro.png";
-import privateUsdLogo from "../assets/private usd.png";
-import privateGbpLogo from "../assets/private gbp.png";
 
 function Swap() {
   const [sellValue, setSellValue] = useState("");
@@ -64,6 +56,7 @@ function Swap() {
     };
 
     fetchData();
+    // eslint-disable-next-line
   }, [sellValue]);
 
   const handleSwapApproval = async () => {
@@ -98,7 +91,7 @@ function Swap() {
       );
     }
     catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

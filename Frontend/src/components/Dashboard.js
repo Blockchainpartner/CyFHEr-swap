@@ -56,14 +56,12 @@ function Dashboard() {
         const token0 = await PairContract.token0();
         const token1 = await PairContract.token1();
 
-        console.log(token0, token1);
         // Fetch token names
         const Token0Contract = new ethers.Contract(token0, ERC_CONTRACT_ABI, signer);
         const Token1Contract = new ethers.Contract(token1, ERC_CONTRACT_ABI, signer);
 
         const token0Name = await Token0Contract.symbol();
         const token1Name = await Token1Contract.symbol();
-        console.log(token0Name, token1Name);
         let newPair = {
           id: i,
           name1: token0Name,

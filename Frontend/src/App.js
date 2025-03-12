@@ -19,7 +19,6 @@ import { motion } from "motion/react";
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(() => {
     const storedWallet = localStorage.getItem("walletAddress");
-    console.log(storedWallet);
     return storedWallet ? true : false;
   });
 
