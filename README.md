@@ -2,6 +2,62 @@
 
 > A **confidential Automated Market Maker** based on Uniswap V2, deployed on the Fhenix Nitrogen testnet, enabling fully **end-to-end encrypted swaps**.
 
+## Installation and Usage
+
+### Smart Contracts
+
+#### Installation
+```sh
+npm install
+```
+
+#### Testing
+Start the Fhenix local node:
+```sh
+npm run localfhenix:start
+```
+Run tests using the Fhenix local node:
+```sh
+npm run test
+```
+Or run tests with mocked FHE on Hardhat:
+```sh
+npm run test:hardhat
+```
+
+#### Deployment
+1. Deploy tokens and the token distributor:
+   ```sh
+   npm run deploy:tokens
+   ```
+2. Make the token distributor the owner of the tokens (execute for all three tokens):
+   ```sh
+   npm run task:transferOwnership -- 'TOKEN_DISTRIBUTOR_ADDRESS' 'TOKEN_ADDRESS'
+   ```
+3. Deploy the AMM:
+   ```sh
+   npm run deploy:amm
+   ```
+
+### Frontend
+#### Installation
+```sh
+npm install
+```
+
+#### Running the Frontend
+On Windows:
+```sh
+npm start
+```
+On non-Windows machines, remove `set PORT=5000 &&` from `package.json` before running:
+```sh
+npm start
+```
+
+#### Configuring Contracts
+Copy the deployed contract addresses into `contracts/constants.js` before using the frontend
+
 ## Project history
 
 For years, at Blockchain Partner by KPMG, we have guided clients in exploring blockchain and crypto assets related innovations. Among the key concerns consistently raised in our research and advisory work, **data confidentiality** has always been on the tops, especially for **financial institutions** and **corporate** clients.
