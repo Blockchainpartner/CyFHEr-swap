@@ -79,13 +79,18 @@ contract CyfherPair is PFHERC20 {
         if (totalSupplyIsZero) {
             // transferfrom function is unsafe as it does not check if the user has approved the token
             // need to add check if the user has approved the token
-            bool isAmountZero = FHE.decrypt(FHE.eq(amount0, FHE.asEuint32(0)));
-            require(!isAmountZero, "CyfherSwap: Not enough tokens Approved");
-            // this can underflow if the user has not approved the token
-            liquidity = FHE.sub(
-                CyfherSwapLibrary.Esqrt(FHE.mul(amount0, amount1)),
-                MINIMUM_LIQUIDITY
+            bool isAmountZero1 = FHE.decrypt(FHE.eq(amount0, FHE.asEuint32(0)));
+            bool isAmountZero2 = FHE.decrypt(FHE.eq(amount1, FHE.asEuint32(0)));
+
+            require(
+                !isAmountZero1 && !isAmountZero2,
+                "CyfherSwap: Not enough tokens Approved"
             );
+            // this can underflow if the user has aproved tokens but has not enough balance
+            //this easily overflows
+            euint32 square = FHE.mul(amount0, amount1);
+            euint32 squareroot = CyfherSwapLibrary.Esqrt(square);
+            liquidity = FHE.sub(squareroot, MINIMUM_LIQUIDITY);
             _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
             euint32 liquidity1 = FHE.div(

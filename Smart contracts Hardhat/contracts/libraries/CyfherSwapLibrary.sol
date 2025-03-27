@@ -83,24 +83,24 @@ library CyfherSwapLibrary {
         euint32 amountIn,
         address[] memory path
     ) internal view returns (euint32 amountOut) {
-        FHE.req(FHE.gt(amountIn, FHE.asEuint32(0)));
+        //FHE.req(FHE.gt(amountIn, FHE.asEuint32(0)));
         // Imported from getAmountsOut function
         (euint32 reserveIn, euint32 reserveOut) = getReserves(
             factory,
             path[0],
             path[1]
         );
-        FHE.req(
+        /*         FHE.req(
             FHE.and(
-                FHE.gt(reserveIn, FHE.asEuint32(0)),
-                FHE.gt(reserveOut, FHE.asEuint32(0))
+                FHE.gte(reserveIn, FHE.asEuint32(0)),
+                FHE.gte(reserveOut, FHE.asEuint32(0))
             )
-        );
-        euint32 amountInWithFee = FHE.mul(amountIn, FHE.asEuint32(997));
-        euint32 numerator = FHE.mul(amountInWithFee, reserveOut);
+        ); */
+        //    euint32 amountInWithFee = FHE.mul(amountIn, FHE.asEuint32(997));
+        euint32 numerator = FHE.mul(amountIn, reserveOut);
         euint32 denominator = FHE.add(
-            FHE.mul(reserveIn, FHE.asEuint32(1000)),
-            amountInWithFee
+            reserveIn, //FHE.mul(reserveIn, FHE.asEuint32(1000)),
+            amountIn
         );
         amountOut = FHE.div(numerator, denominator);
     }

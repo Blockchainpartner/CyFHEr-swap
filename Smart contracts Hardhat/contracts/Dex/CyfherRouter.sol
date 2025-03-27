@@ -179,14 +179,13 @@ contract CyfherRouter {
         address to
     ) external virtual {
         euint32 amountIn = FHE.asEuint32(amountInInput);
-        euint32 amountOutMin = FHE.asEuint32(amountOutMinInput);
+        // euint32 amountOutMin = FHE.asEuint32(amountOutMinInput);
         euint32 amountOutput = CyfherSwapLibrary.getAmountOut(
             factory,
             amountIn,
             path
         );
-
-        FHE.req(FHE.gte(amountOutput, amountOutMin));
+        //FHE.req(FHE.gte(amountOutput, amountOutMin));
         IPFHERC20(path[0]).unsafe_transferFrom(
             msg.sender,
             CyfherSwapLibrary.pairFor(factory, path[0], path[1]),
